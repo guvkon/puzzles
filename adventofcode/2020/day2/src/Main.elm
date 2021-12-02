@@ -1,5 +1,6 @@
 module Main exposing (..)
 
+import Array
 import Browser
 import Html exposing (Html, Attribute, div, textarea, text)
 import Html.Attributes exposing (..)
@@ -113,13 +114,19 @@ solution1 { input } =
 
 solution2 : Model -> Int
 solution2 { input } =
-    0
+    countValidPasswords2 input
 
 
 countValidPasswords : List Password -> Int
 countValidPasswords passwords =
     passwords
         |> List.foldl (\pass count -> count + if validPassword pass then 1 else 0) 0
+
+
+countValidPasswords2 : List Password -> Int
+countValidPasswords2 passwords =
+    passwords
+        |> List.foldl (\pass count -> count + if validPassword2 pass then 1 else 0) 0
 
 
 validPassword : Password -> Bool
@@ -133,5 +140,31 @@ validPassword { min, max, symbol, pass } =
         True
     else
         False
+
+
+validPassword2 : Password -> Bool
+validPassword2 { min, max, symbol, pass } =
+    let
+        chars =
+            String.toList pass
+                |> Array.fromList
+        char =
+            case List.head (String.toList symbol) of
+                Just chr -> chr
+                Nothing -> ' '
+        left =
+            case Array.get (min - 1) chars of
+                Just elem -> elem == char
+                Nothing -> False
+        right =
+            case Array.get (max - 1) chars of
+                Just elem -> elem == char
+                Nothing -> False
+
+    in
+    if left && right then
+        False
+    else
+        left || right
 
 
