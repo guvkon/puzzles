@@ -160,7 +160,6 @@ validPassword2 { min, max, symbol, pass } =
             case Array.get (max - 1) chars of
                 Just elem -> elem == char
                 Nothing -> False
-
     in
     if left && right then
         False
