@@ -4,7 +4,6 @@ import Browser
 import Html exposing (Html, Attribute, div, textarea, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
-import ParseInt exposing (parseInt, toRadix)
 
 
 -- MAIN
@@ -26,8 +25,8 @@ type alias Model =
 
 init : Model
 init =
-  { input = []
-  , content = ""
+  { input = parseInput defaultContent
+  , content = defaultContent
   }
 
 
@@ -46,26 +45,6 @@ update msg model =
       { model | content = newContent, input = parseInput newContent }
 
 
-parseInput : String -> List Int
-parseInput str =
-    List.filter isPositive (List.map parseIntAlways (String.lines str))
-
-
-isPositive : Int -> Bool
-isPositive val =
-    if val > 0 then
-        True
-    else
-        False
-
-
-parseIntAlways : String -> Int
-parseIntAlways str =
-    case parseInt str of
-        Ok val -> val
-        Err _ -> 0
-
-
 
 -- VIEW
 
@@ -73,11 +52,32 @@ parseIntAlways str =
 view : Model -> Html Msg
 view model =
   div []
-    [ textarea [ placeholder "Input", value model.content, onInput Change, rows 40, cols 100 ] []
-    , div [] [ text ("Input size: " ++ String.fromInt (List.length model.input)) ]
-    , div [] [ text ("Number of increases: " ++ String.fromInt (increases model.input)) ]
-    , div [] [ text ("Number of increases with less noise: " ++ String.fromInt (increases (averageInput model.input))) ]
+    [ textarea [ placeholder "Input", value model.content, onInput Change, rows 20, cols 40, class "bg-dark text-light border-1 border-secondary p-2" ] []
+    , div [] [ text ( "Input size: " ++ String.fromInt ( List.length model.input ) ) ]
+    , div [] [ text ( "Solution 1: " ++ String.fromInt ( solution1 model ) ) ]
+    , div [] [ text ( "Solution 2: " ++ String.fromInt ( solution2 model ) ) ]
     ]
+
+
+-- LOGIC
+
+
+defaultContent = "199\n200\n208\n210\n200\n207\n240\n269\n260\n263"
+
+
+parseInput : String -> List Int
+parseInput str =
+    List.filterMap String.toInt (String.lines str)
+
+
+solution1 : Model -> Int
+solution1 model =
+    increases model.input
+
+
+solution2 : Model -> Int
+solution2 model =
+    increases (averageInput model.input)
 
 
 increases : List Int -> Int
@@ -100,9 +100,6 @@ takes amount list =
 
 averageInput : List Int -> List Int
 averageInput input =
-    List.map3 average (takes 2 input) (List.drop 1 (takes 1 input)) (List.drop 2 input)
+    List.map3 (\a b c -> a + b + c) (takes 2 input) (List.drop 1 (takes 1 input)) (List.drop 2 input)
 
 
-average : Int -> Int -> Int -> Int
-average a b c =
-    a + b + c
