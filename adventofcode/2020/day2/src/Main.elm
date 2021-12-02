@@ -134,10 +134,7 @@ validPassword { min, max, symbol, pass } =
             String.indexes symbol pass
                 |> List.length
     in
-    if min <= inclusions && max >= inclusions then
-        True
-    else
-        False
+    min <= inclusions && max >= inclusions
 
 
 validPassword2 : Password -> Bool

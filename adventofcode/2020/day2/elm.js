@@ -5918,7 +5918,7 @@ var $author$project$Main$validPassword = function (_v0) {
 	var pass = _v0.pass;
 	var inclusions = $elm$core$List$length(
 		A2($elm$core$String$indexes, symbol, pass));
-	return ((_Utils_cmp(min, inclusions) < 1) && (_Utils_cmp(max, inclusions) > -1)) ? true : false;
+	return (_Utils_cmp(min, inclusions) < 1) && (_Utils_cmp(max, inclusions) > -1);
 };
 var $author$project$Main$solution1 = function (_v0) {
 	var input = _v0.input;
