@@ -5902,6 +5902,17 @@ var $elm$html$Html$Attributes$rows = function (n) {
 		'rows',
 		$elm$core$String$fromInt(n));
 };
+var $author$project$Main$countValidPasswords = F2(
+	function (isValid, passwords) {
+		return A3(
+			$elm$core$List$foldl,
+			F2(
+				function (pass, count) {
+					return count + (isValid(pass) ? 1 : 0);
+				}),
+			0,
+			passwords);
+	});
 var $elm$core$Basics$ge = _Utils_ge;
 var $author$project$Main$validPassword = function (_v0) {
 	var min = _v0.min;
@@ -5912,19 +5923,9 @@ var $author$project$Main$validPassword = function (_v0) {
 		A2($elm$core$String$indexes, symbol, pass));
 	return ((_Utils_cmp(min, inclusions) < 1) && (_Utils_cmp(max, inclusions) > -1)) ? true : false;
 };
-var $author$project$Main$countValidPasswords = function (passwords) {
-	return A3(
-		$elm$core$List$foldl,
-		F2(
-			function (pass, count) {
-				return count + ($author$project$Main$validPassword(pass) ? 1 : 0);
-			}),
-		0,
-		passwords);
-};
 var $author$project$Main$solution1 = function (_v0) {
 	var input = _v0.input;
-	return $author$project$Main$countValidPasswords(input);
+	return A2($author$project$Main$countValidPasswords, $author$project$Main$validPassword, input);
 };
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
@@ -6052,19 +6053,9 @@ var $author$project$Main$validPassword2 = function (_v0) {
 	}();
 	return (left && right) ? false : (left || right);
 };
-var $author$project$Main$countValidPasswords2 = function (passwords) {
-	return A3(
-		$elm$core$List$foldl,
-		F2(
-			function (pass, count) {
-				return count + ($author$project$Main$validPassword2(pass) ? 1 : 0);
-			}),
-		0,
-		passwords);
-};
 var $author$project$Main$solution2 = function (_v0) {
 	var input = _v0.input;
-	return $author$project$Main$countValidPasswords2(input);
+	return A2($author$project$Main$countValidPasswords, $author$project$Main$validPassword2, input);
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;

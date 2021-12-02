@@ -109,24 +109,18 @@ letters =
 
 solution1 : Model -> Int
 solution1 { input } =
-    countValidPasswords input
+    countValidPasswords validPassword input
 
 
 solution2 : Model -> Int
 solution2 { input } =
-    countValidPasswords2 input
+    countValidPasswords validPassword2 input
 
 
-countValidPasswords : List Password -> Int
-countValidPasswords passwords =
+countValidPasswords : (Password -> Bool) -> List Password -> Int
+countValidPasswords isValid passwords =
     passwords
-        |> List.foldl (\pass count -> count + if validPassword pass then 1 else 0) 0
-
-
-countValidPasswords2 : List Password -> Int
-countValidPasswords2 passwords =
-    passwords
-        |> List.foldl (\pass count -> count + if validPassword2 pass then 1 else 0) 0
+        |> List.foldl (\pass count -> count + if isValid pass then 1 else 0) 0
 
 
 validPassword : Password -> Bool
