@@ -93,32 +93,47 @@ charToPosition chr =
 
 solution1 : Model -> Int
 solution1 { input } =
-    walk input
+    walk 3 1 input
 
 
 solution2 : Model -> Int
 solution2 { input } =
-    0
+    walk 1 1 input
+        |> (*) (walk 3 1 input)
+        |> (*) (walk 5 1 input)
+        |> (*) (walk 7 1 input)
+        |> (*) (walk 1 2 input)
 
 
-walk : List Line -> Int
-walk lines =
+walk : Int -> Int -> List Line -> Int
+walk right down lines =
+    case lines of
+        x :: xs ->
+            case List.foldl (stepRight right) (right, 0) (filterLines down xs) of
+                (_, count) -> count
+        _ -> 0
+
+
+filterLines : Int -> List Line -> List Line
+filterLines down lines =
+    lines
+        |> Array.fromList
+        |> Array.toIndexedList
+        |> List.filter (\(index, _) -> down - 1 == modBy down index)
+        |> List.map (\(_, val) -> val)
+
+
+stepRight : Int -> Line -> (Int, Int) -> (Int, Int)
+stepRight step line (position, count) =
     let
         isTree =
-            \pos line ->
-                case Array.get (modBy (Array.length line) pos) line of
+            \pos aLine ->
+                case Array.get (modBy (Array.length aLine) pos) aLine of
                     Just loc -> case loc of
                         Tree -> True
                         Open -> False
                     Nothing -> False
-        step =
-            \line (pos, count) ->
-                (pos + 3, count + if isTree pos (Array.fromList line) then 1 else 0)
     in
-    case lines of
-        x :: xs ->
-            case List.foldl step (3, 0) xs of
-                (_, count) -> count
-        _ -> 0
+    (position + step, count + if isTree position (Array.fromList line) then 1 else 0)
 
 

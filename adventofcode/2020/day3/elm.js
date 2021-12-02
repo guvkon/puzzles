@@ -5303,6 +5303,17 @@ var $elm$html$Html$Attributes$rows = function (n) {
 		'rows',
 		$elm$core$String$fromInt(n));
 };
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
 		fromListHelp:
@@ -5338,6 +5349,49 @@ var $elm$core$Array$fromList = function (list) {
 		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
 	}
 };
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $elm$core$Array$toIndexedList = function (array) {
+	var len = array.a;
+	var helper = F2(
+		function (entry, _v0) {
+			var index = _v0.a;
+			var list = _v0.b;
+			return _Utils_Tuple2(
+				index - 1,
+				A2(
+					$elm$core$List$cons,
+					_Utils_Tuple2(index, entry),
+					list));
+		});
+	return A3(
+		$elm$core$Array$foldr,
+		helper,
+		_Utils_Tuple2(len - 1, _List_Nil),
+		array).b;
+};
+var $author$project$Main$filterLines = F2(
+	function (down, lines) {
+		return A2(
+			$elm$core$List$map,
+			function (_v1) {
+				var val = _v1.b;
+				return val;
+			},
+			A2(
+				$elm$core$List$filter,
+				function (_v0) {
+					var index = _v0.a;
+					return _Utils_eq(
+						down - 1,
+						A2($elm$core$Basics$modBy, down, index));
+				},
+				$elm$core$Array$toIndexedList(
+					$elm$core$Array$fromList(lines))));
+	});
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
@@ -5384,60 +5438,60 @@ var $elm$core$Array$length = function (_v0) {
 	var len = _v0.a;
 	return len;
 };
-var $elm$core$Basics$modBy = _Basics_modBy;
-var $author$project$Main$walk = function (lines) {
-	var isTree = F2(
-		function (pos, line) {
-			var _v3 = A2(
-				$elm$core$Array$get,
-				A2(
-					$elm$core$Basics$modBy,
-					$elm$core$Array$length(line),
-					pos),
-				line);
-			if (_v3.$ === 'Just') {
-				var loc = _v3.a;
-				if (loc.$ === 'Tree') {
-					return true;
+var $author$project$Main$stepRight = F3(
+	function (step, line, _v0) {
+		var position = _v0.a;
+		var count = _v0.b;
+		var isTree = F2(
+			function (pos, aLine) {
+				var _v1 = A2(
+					$elm$core$Array$get,
+					A2(
+						$elm$core$Basics$modBy,
+						$elm$core$Array$length(aLine),
+						pos),
+					aLine);
+				if (_v1.$ === 'Just') {
+					var loc = _v1.a;
+					if (loc.$ === 'Tree') {
+						return true;
+					} else {
+						return false;
+					}
 				} else {
 					return false;
 				}
-			} else {
-				return false;
-			}
-		});
-	var step = F2(
-		function (line, _v2) {
-			var pos = _v2.a;
-			var count = _v2.b;
-			return _Utils_Tuple2(
-				pos + 3,
-				count + (A2(
-					isTree,
-					pos,
-					$elm$core$Array$fromList(line)) ? 1 : 0));
-		});
-	if (lines.b) {
-		var x = lines.a;
-		var xs = lines.b;
-		var _v1 = A3(
-			$elm$core$List$foldl,
-			step,
-			_Utils_Tuple2(3, 0),
-			xs);
-		var count = _v1.b;
-		return count;
-	} else {
-		return 0;
-	}
-};
+			});
+		return _Utils_Tuple2(
+			position + step,
+			count + (A2(
+				isTree,
+				position,
+				$elm$core$Array$fromList(line)) ? 1 : 0));
+	});
+var $author$project$Main$walk = F3(
+	function (right, down, lines) {
+		if (lines.b) {
+			var x = lines.a;
+			var xs = lines.b;
+			var _v1 = A3(
+				$elm$core$List$foldl,
+				$author$project$Main$stepRight(right),
+				_Utils_Tuple2(right, 0),
+				A2($author$project$Main$filterLines, down, xs));
+			var count = _v1.b;
+			return count;
+		} else {
+			return 0;
+		}
+	});
 var $author$project$Main$solution1 = function (_v0) {
 	var input = _v0.input;
-	return $author$project$Main$walk(input);
+	return A3($author$project$Main$walk, 3, 1, input);
 };
 var $author$project$Main$solution2 = function (_v0) {
 	var input = _v0.input;
-	return 0;
+	return A3($author$project$Main$walk, 1, 2, input) * (A3($author$project$Main$walk, 7, 1, input) * (A3($author$project$Main$walk, 5, 1, input) * (A3($author$project$Main$walk, 3, 1, input) * A3($author$project$Main$walk, 1, 1, input))));
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
