@@ -5265,8 +5265,8 @@ var $elm$html$Html$Attributes$rows = function (n) {
 		'rows',
 		$elm$core$String$fromInt(n));
 };
-var $author$project$Main$findElemPair = F2(
-	function (x, xs) {
+var $author$project$Main$findElemPair = F3(
+	function (x, xs, target) {
 		findElemPair:
 		while (true) {
 			if (!xs.b) {
@@ -5274,66 +5274,113 @@ var $author$project$Main$findElemPair = F2(
 			} else {
 				var y = xs.a;
 				var ys = xs.b;
-				if ((x + y) === 2020) {
-					return $elm$core$Maybe$Just(
-						_Utils_Tuple2(x, y));
+				if (_Utils_eq(x + y, target)) {
+					return $elm$core$Maybe$Just(y);
 				} else {
 					var $temp$x = x,
-						$temp$xs = ys;
+						$temp$xs = ys,
+						$temp$target = target;
 					x = $temp$x;
 					xs = $temp$xs;
+					target = $temp$target;
 					continue findElemPair;
 				}
 			}
 		}
 	});
-var $author$project$Main$findPair = function (input) {
-	findPair:
-	while (true) {
-		if (!input.b) {
-			return $elm$core$Maybe$Nothing;
-		} else {
-			if (!input.b.b) {
-				var x = input.a;
+var $author$project$Main$findPair = F2(
+	function (input, target) {
+		findPair:
+		while (true) {
+			if (!input.b) {
 				return $elm$core$Maybe$Nothing;
 			} else {
-				var x = input.a;
-				var xs = input.b;
-				var _v1 = A2($author$project$Main$findElemPair, x, xs);
-				if (_v1.$ === 'Just') {
-					var pair = _v1.a;
-					return $elm$core$Maybe$Just(pair);
+				if (!input.b.b) {
+					var x = input.a;
+					return $elm$core$Maybe$Nothing;
 				} else {
-					var $temp$input = xs;
-					input = $temp$input;
-					continue findPair;
+					var x = input.a;
+					var xs = input.b;
+					var _v1 = A3($author$project$Main$findElemPair, x, xs, target);
+					if (_v1.$ === 'Just') {
+						var y = _v1.a;
+						return $elm$core$Maybe$Just(
+							_Utils_Tuple2(x, y));
+					} else {
+						var $temp$input = xs,
+							$temp$target = target;
+						input = $temp$input;
+						target = $temp$target;
+						continue findPair;
+					}
 				}
 			}
 		}
-	}
+	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
 };
 var $author$project$Main$solution1 = function (_v0) {
 	var input = _v0.input;
-	var _v1 = $author$project$Main$findPair(input);
+	var _v1 = A2($author$project$Main$findPair, input, 2020);
 	if (_v1.$ === 'Just') {
 		var _v2 = _v1.a;
 		var x = _v2.a;
 		var y = _v2.b;
 		return x * y;
 	} else {
-		return 0;
+		return -1;
 	}
 };
+var $author$project$Main$findTriple = F2(
+	function (input, target) {
+		findTriple:
+		while (true) {
+			if (!input.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				if (!input.b.b) {
+					var x = input.a;
+					return $elm$core$Maybe$Nothing;
+				} else {
+					if (!input.b.b.b) {
+						var x = input.a;
+						var _v1 = input.b;
+						var y = _v1.a;
+						return $elm$core$Maybe$Nothing;
+					} else {
+						var x = input.a;
+						var xs = input.b;
+						var _v2 = A2($author$project$Main$findPair, xs, target - x);
+						if (_v2.$ === 'Just') {
+							var _v3 = _v2.a;
+							var y = _v3.a;
+							var z = _v3.b;
+							return $elm$core$Maybe$Just(
+								_Utils_Tuple3(x, y, z));
+						} else {
+							var $temp$input = xs,
+								$temp$target = target;
+							input = $temp$input;
+							target = $temp$target;
+							continue findTriple;
+						}
+					}
+				}
+			}
+		}
+	});
 var $author$project$Main$solution2 = function (_v0) {
 	var input = _v0.input;
-	var _v1 = $author$project$Main$findPair(input);
+	var _v1 = A2($author$project$Main$findTriple, input, 2020);
 	if (_v1.$ === 'Just') {
 		var _v2 = _v1.a;
 		var x = _v2.a;
 		var y = _v2.b;
-		return x * y;
+		var z = _v2.c;
+		return (x * y) * z;
 	} else {
-		return 0;
+		return -1;
 	}
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;

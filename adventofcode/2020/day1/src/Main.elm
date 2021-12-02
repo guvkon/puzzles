@@ -65,6 +65,9 @@ view model =
 type alias Pair = (Int, Int)
 
 
+type alias Triple = (Int, Int, Int)
+
+
 defaultContent = "1721\n979\n366\n299\n675\n1456"
 
 
@@ -75,39 +78,51 @@ parseInput str =
 
 solution1 : Model -> Int
 solution1 { input } =
-    case findPair input of
+    case findPair input 2020 of
         Just (x, y) -> x * y
-        Nothing -> 0
+        Nothing -> -1
 
 
 solution2 : Model -> Int
 solution2 { input } =
-    case findPair input of
-        Just (x, y) -> x * y
-        Nothing -> 0
+    case findTriple input 2020 of
+        Just (x, y, z) -> x * y * z
+        Nothing -> -1
 
 
-findPair : List Int -> Maybe Pair
-findPair input =
+findPair : List Int -> Int -> Maybe Pair
+findPair input target =
     case input of
         [] -> Nothing
         x :: [] -> Nothing
         x :: xs ->
-            case findElemPair x xs of
-                Just pair -> Just pair
-                Nothing -> findPair xs
+            case findElemPair x xs target of
+                Just y -> Just (x, y)
+                Nothing -> findPair xs target
         
 
 
 
-findElemPair : Int -> List Int -> Maybe Pair
-findElemPair x xs =
+findElemPair : Int -> List Int -> Int -> Maybe Int
+findElemPair x xs target =
     case xs of
         [] -> Nothing
         y :: ys ->
-            if x + y == 2020 then
-                Just (x, y)
+            if x + y == target then
+                Just y
             else
-                findElemPair x ys
+                findElemPair x ys target
+
+
+findTriple : List Int -> Int -> Maybe Triple
+findTriple input target =
+    case input of
+        [] -> Nothing
+        x :: [] -> Nothing
+        x :: y :: [] -> Nothing
+        x :: xs ->
+            case findPair xs (target - x) of
+                Just (y, z) -> Just (x, y, z)
+                Nothing -> findTriple xs target
 
 
