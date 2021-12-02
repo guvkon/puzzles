@@ -119,8 +119,12 @@ solution2 { input } =
 
 countValidPasswords : (Password -> Bool) -> List Password -> Int
 countValidPasswords isValid passwords =
-    passwords
-        |> List.foldl (\pass count -> count + if isValid pass then 1 else 0) 0
+    let
+        counter =
+            \pass count ->
+                count + if isValid pass then 1 else 0
+    in
+    List.foldl counter 0 passwords
 
 
 validPassword : Password -> Bool

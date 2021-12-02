@@ -5904,14 +5904,11 @@ var $elm$html$Html$Attributes$rows = function (n) {
 };
 var $author$project$Main$countValidPasswords = F2(
 	function (isValid, passwords) {
-		return A3(
-			$elm$core$List$foldl,
-			F2(
-				function (pass, count) {
-					return count + (isValid(pass) ? 1 : 0);
-				}),
-			0,
-			passwords);
+		var counter = F2(
+			function (pass, count) {
+				return count + (isValid(pass) ? 1 : 0);
+			});
+		return A3($elm$core$List$foldl, counter, 0, passwords);
 	});
 var $elm$core$Basics$ge = _Utils_ge;
 var $author$project$Main$validPassword = function (_v0) {
