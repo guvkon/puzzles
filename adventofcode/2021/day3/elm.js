@@ -5337,6 +5337,33 @@ var $icidasset$elm_binary$Binary$fromIntegers = A2(
 			return A3($icidasset$elm_binary$Binary$ifThenElse, i <= 0, false, true);
 		}),
 	$icidasset$elm_binary$Binary$Bits);
+var $elm$core$Basics$pow = _Basics_pow;
+var $icidasset$elm_binary$Binary$toDecimal = function (_v0) {
+	var bits = _v0.a;
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (bit, _v1) {
+				var x = _v1.a;
+				var exponent = _v1.b;
+				return _Utils_Tuple2(
+					(A2($elm$core$Basics$pow, 2, exponent) * A3($icidasset$elm_binary$Binary$ifThenElse, bit, 1, 0)) + x,
+					exponent - 1);
+			}),
+		_Utils_Tuple2(
+			0,
+			$elm$core$List$length(bits) - 1),
+		bits).a;
+};
+var $author$project$Main$decimal = function (bits) {
+	return $icidasset$elm_binary$Binary$toDecimal(
+		$icidasset$elm_binary$Binary$fromIntegers(bits));
+};
+var $author$project$Main$genericRating1 = F2(
+	function (compare, hrzInput) {
+		return $author$project$Main$decimal(
+			A2($elm$core$List$map, compare, hrzInput));
+	});
 var $author$project$Main$Neither = {$: 'Neither'};
 var $author$project$Main$One = {$: 'One'};
 var $author$project$Main$Zero = {$: 'Zero'};
@@ -5360,31 +5387,11 @@ var $author$project$Main$leastCommonBit = F2(
 				return _default;
 		}
 	});
-var $elm$core$Basics$pow = _Basics_pow;
-var $icidasset$elm_binary$Binary$toDecimal = function (_v0) {
-	var bits = _v0.a;
-	return A3(
-		$elm$core$List$foldl,
-		F2(
-			function (bit, _v1) {
-				var x = _v1.a;
-				var exponent = _v1.b;
-				return _Utils_Tuple2(
-					(A2($elm$core$Basics$pow, 2, exponent) * A3($icidasset$elm_binary$Binary$ifThenElse, bit, 1, 0)) + x,
-					exponent - 1);
-			}),
-		_Utils_Tuple2(
-			0,
-			$elm$core$List$length(bits) - 1),
-		bits).a;
-};
 var $author$project$Main$epsilonRate = function (hrzInput) {
-	return $icidasset$elm_binary$Binary$toDecimal(
-		$icidasset$elm_binary$Binary$fromIntegers(
-			A2(
-				$elm$core$List$map,
-				$author$project$Main$leastCommonBit(0),
-				hrzInput)));
+	return A2(
+		$author$project$Main$genericRating1,
+		$author$project$Main$leastCommonBit(0),
+		hrzInput);
 };
 var $author$project$Main$mostCommonBit = F2(
 	function (_default, list) {
@@ -5399,12 +5406,10 @@ var $author$project$Main$mostCommonBit = F2(
 		}
 	});
 var $author$project$Main$gammaRate = function (hrzInput) {
-	return $icidasset$elm_binary$Binary$toDecimal(
-		$icidasset$elm_binary$Binary$fromIntegers(
-			A2(
-				$elm$core$List$map,
-				$author$project$Main$mostCommonBit(1),
-				hrzInput)));
+	return A2(
+		$author$project$Main$genericRating1,
+		$author$project$Main$mostCommonBit(0),
+		hrzInput);
 };
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
@@ -5537,10 +5542,6 @@ var $author$project$Main$solution1 = function (_v0) {
 	var hrzInput = $author$project$Main$horizontalInput(input);
 	return $author$project$Main$epsilonRate(hrzInput) * $author$project$Main$gammaRate(hrzInput);
 };
-var $author$project$Main$decimal = function (bits) {
-	return $icidasset$elm_binary$Binary$toDecimal(
-		$icidasset$elm_binary$Binary$fromIntegers(bits));
-};
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -5559,9 +5560,9 @@ var $author$project$Main$getElemList = F2(
 			index,
 			$elm$core$Array$fromList(lines));
 	});
-var $author$project$Main$genericRating = F3(
+var $author$project$Main$genericRating2 = F3(
 	function (compare, index, input) {
-		genericRating:
+		genericRating2:
 		while (true) {
 			if (!input.b) {
 				return 0;
@@ -5594,7 +5595,7 @@ var $author$project$Main$genericRating = F3(
 						compare = $temp$compare;
 						index = $temp$index;
 						input = $temp$input;
-						continue genericRating;
+						continue genericRating2;
 					} else {
 						return $author$project$Main$decimal(x);
 					}
@@ -5605,7 +5606,7 @@ var $author$project$Main$genericRating = F3(
 var $author$project$Main$co2Rating = F2(
 	function (index, input) {
 		return A3(
-			$author$project$Main$genericRating,
+			$author$project$Main$genericRating2,
 			$author$project$Main$leastCommonBit(0),
 			index,
 			input);
@@ -5613,7 +5614,7 @@ var $author$project$Main$co2Rating = F2(
 var $author$project$Main$oxygenRating = F2(
 	function (index, input) {
 		return A3(
-			$author$project$Main$genericRating,
+			$author$project$Main$genericRating2,
 			$author$project$Main$mostCommonBit(1),
 			index,
 			input);

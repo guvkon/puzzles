@@ -72,6 +72,14 @@ parseInput str =
     List.map (\line -> List.filterMap (\char -> String.toInt (String.fromChar char)) (String.toList line)) (String.lines str)
 
 
+horizontalInput : List (List Int) -> List (List Int)
+horizontalInput input =
+    case input of
+        x :: xs ->
+            List.map (\(idx, _) -> List.filterMap (getElem idx) input) (Array.toIndexedList (Array.fromList x))
+        [] -> []
+
+
 solution1 : Model -> Int
 solution1 { input } =
     let
@@ -88,12 +96,61 @@ solution2 { input } =
         |> (*) (co2Rating 0 input)
 
 
-horizontalInput : List (List Int) -> List (List Int)
-horizontalInput input =
+gammaRate : List (List Int) -> Int
+gammaRate hrzInput =
+    genericRating1 (mostCommonBit 0) hrzInput
+
+
+epsilonRate : List (List Int) -> Int
+epsilonRate hrzInput =
+    genericRating1 (leastCommonBit 0) hrzInput
+
+
+genericRating1 : (List Int -> Int) -> List (List Int) -> Int
+genericRating1 compare hrzInput =
+    List.map compare hrzInput
+        |> decimal
+
+
+oxygenRating : Int -> List (List Int) -> Int
+oxygenRating index input =
+    genericRating2 (mostCommonBit 1) index input
+
+
+co2Rating : Int -> List (List Int) -> Int
+co2Rating index input =
+    genericRating2 (leastCommonBit 0) index input
+
+
+genericRating2 : (List Int -> Int) -> Int -> List (List Int) -> Int
+genericRating2 compare index input =
     case input of
+        [] -> 0
+        x :: [] ->
+            decimal x
         x :: xs ->
-            List.map (\(idx, _) -> List.filterMap (getElem idx) input) (Array.toIndexedList (Array.fromList x))
-        [] -> []
+            case getElemList index (horizontalInput input)  of
+                Just line ->
+                    let
+                        bit =
+                            compare line
+                        filtr =
+                            \num ->
+                                case getElem index num of
+                                    Just val ->
+                                        val == bit
+                                    Nothing ->
+                                        False
+                    in
+                    genericRating2 compare (index + 1) (List.filter filtr input)
+                Nothing ->
+                    decimal x
+
+
+decimal : List Int -> Int
+decimal bits =
+    Binary.fromIntegers bits
+        |> Binary.toDecimal
 
 
 getElem : Int -> List Int -> Maybe Int
@@ -104,6 +161,22 @@ getElem index line =
 getElemList : Int -> List (List Int) -> Maybe (List Int)
 getElemList index lines =
     Array.get index (Array.fromList lines)
+
+
+mostCommonBit : Int -> List Int -> Int
+mostCommonBit default list =
+    case commonBit list of
+        One -> 1
+        Zero -> 0
+        Neither -> default
+
+
+leastCommonBit : Int -> List Int -> Int
+leastCommonBit default list =
+    case commonBit list of
+        One -> 0
+        Zero -> 1
+        Neither -> default
 
 
 type CommonBit = Zero | One | Neither
@@ -123,77 +196,5 @@ commonBit list =
         One
     else
         Zero
-
-
-mostCommonBit : Int -> List Int -> Int
-mostCommonBit default list =
-    case commonBit list of
-        One -> 1
-        Zero -> 0
-        Neither -> default
-
-
-leastCommonBit : Int -> List Int -> Int
-leastCommonBit default list =
-    case commonBit list of
-        One -> 0
-        Zero -> 1
-        Neither -> default
-
-
-gammaRate : List (List Int) -> Int
-gammaRate hrzInput =
-    List.map (mostCommonBit 1) hrzInput
-        |> Binary.fromIntegers
-        |> Binary.toDecimal
-
-
-epsilonRate : List (List Int) -> Int
-epsilonRate hrzInput =
-    List.map (leastCommonBit 0) hrzInput
-        |> Binary.fromIntegers
-        |> Binary.toDecimal
-
-
-decimal : List Int -> Int
-decimal bits =
-    Binary.fromIntegers bits
-        |> Binary.toDecimal
-
-
-oxygenRating : Int -> List (List Int) -> Int
-oxygenRating index input =
-    genericRating (mostCommonBit 1) index input
-
-
-co2Rating : Int -> List (List Int) -> Int
-co2Rating index input =
-    genericRating (leastCommonBit 0) index input
-
-
-genericRating : (List Int -> Int) -> Int -> List (List Int) -> Int
-genericRating compare index input =
-    case input of
-        [] -> 0
-        x :: [] ->
-            decimal x
-        x :: xs ->
-            case getElemList index (horizontalInput input)  of
-                Just line ->
-                    let
-                        bit =
-                            compare line
-                        filtr =
-                            \num ->
-                                case getElem index num of
-                                    Just val ->
-                                        val == bit
-                                    Nothing ->
-                                        False
-                    in
-                    genericRating compare (index + 1) (List.filter filtr input)
-                Nothing ->
-                    decimal x
-
 
 
