@@ -1,8 +1,8 @@
-module Utils exposing (decimal, indexes, element, letters)
+module Utils exposing (decimal, indexes, element, letters, stringEntry)
 
 import Array
 import Binary
-import Parser exposing (Parser, succeed, (|.), chompWhile, getChompedString)
+import Parser exposing ((|.), Parser, chompIf, chompWhile, getChompedString, succeed)
 
 
 -- Binary
@@ -39,7 +39,13 @@ slice start end list =
 
 letters : Parser String
 letters =
+    stringEntry Char.isAlpha
+
+
+stringEntry : (Char -> Bool) -> Parser String
+stringEntry check =
     succeed ()
-        |. chompWhile Char.isAlpha
+        |. chompIf check
+        |. chompWhile check
         |> getChompedString
 

@@ -4,7 +4,8 @@ import Browser
 import Html exposing (Html, Attribute, div, textarea, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
-import Parser exposing ((|.), (|=), Parser, chompWhile, getChompedString, succeed, symbol)
+import Parser exposing ((|.), (|=), Parser, int, succeed, symbol)
+import Utils exposing (letters, stringEntry)
 
 
 -- MAIN
@@ -77,20 +78,41 @@ type alias Field = { key: String
                    }
 
 
+type alias Height = { value : Int
+                    , metric : String
+                    }
+
+
+type alias HairColor = { color : String }
+
+
 defaultContent =
-    """ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
-byr:1937 iyr:2017 cid:147 hgt:183cm
+    """pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980
+hcl:#623a2f
 
-iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884
-hcl:#cfa07d byr:1929
+eyr:2029 ecl:blu cid:129 byr:1989
+iyr:2014 pid:896056539 hcl:#a97842 hgt:165cm
 
-hcl:#ae17e1 iyr:2013
-eyr:2024
-ecl:brn pid:760753108 byr:1931
-hgt:179cm
+hcl:#888785
+hgt:164cm byr:2001 iyr:2015 cid:88
+pid:545766238 ecl:hzl
+eyr:2022
 
-hcl:#cfa07d eyr:2025 pid:166559648
-iyr:2011 ecl:brn hgt:59in"""
+iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719
+
+eyr:1972 cid:100
+hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926
+
+iyr:2019
+hcl:#602927 eyr:1967 hgt:170cm
+ecl:grn pid:012533040 byr:1946
+
+hcl:dab227 iyr:2012
+ecl:brn hgt:182cm pid:021572410 eyr:2020 byr:1992 cid:277
+
+hgt:59cm ecl:zzz
+eyr:2038 hcl:74454a iyr:2023
+pid:3556412378 byr:2007"""
 
 
 parseInput : String -> List Passport
@@ -139,36 +161,34 @@ stringsToPassport strings =
 parseField : Parser Field
 parseField =
     succeed Field
-        |= parseFieldElement
+        |= (stringEntry ((/=) ':'))
         |. symbol ":"
-        |= parseFieldElement
-
-
-parseFieldElement : Parser String
-parseFieldElement =
-    succeed ()
-        |. chompWhile ((/=) ':')
-        |> getChompedString
+        |= (stringEntry ((/=) ':'))
 
 
 solution1 : Model -> Int
 solution1 { input } =
-    let
-        step =
-            \pass acc ->
-                acc + if isValidPassport pass then 1 else 0
-    in
-    input
-        |> List.foldl step 0
+    countValidPassports isValidPassport1 input
 
 
 solution2 : Model -> Int
 solution2 { input } =
-    0
+    countValidPassports isValidPassport2 input
 
 
-isValidPassport : Passport -> Bool
-isValidPassport pass =
+countValidPassports : (Passport -> Bool) -> List Passport -> Int
+countValidPassports check passports =
+    let
+        step =
+            \pass acc ->
+                acc + if check pass then 1 else 0
+    in
+    passports
+        |> List.foldl step 0
+
+
+isValidPassport1 : Passport -> Bool
+isValidPassport1 pass =
     containsField "byr" pass
         |> (&&) (containsField "iyr" pass)
         |> (&&) (containsField "eyr" pass)
@@ -178,12 +198,146 @@ isValidPassport pass =
         |> (&&) (containsField "pid" pass)
 
 
+isValidPassport2 : Passport -> Bool
+isValidPassport2 pass =
+    checkByr pass
+        |> (&&) (checkIyr pass)
+        |> (&&) (checkEyr pass)
+        |> (&&) (checkHgt pass)
+        |> (&&) (checkHcl pass)
+        |> (&&) (checkEcl pass)
+        |> (&&) (checkPid pass)
+
+
+checkByr : Passport -> Bool
+checkByr pass =
+    getField "byr" pass
+        |> isNumberInRange 1920 2002
+
+
+checkIyr : Passport -> Bool
+checkIyr pass =
+    getField "iyr" pass
+        |> isNumberInRange 2010 2020
+
+
+checkEyr : Passport -> Bool
+checkEyr pass =
+    getField "eyr" pass
+        |> isNumberInRange 2020 2030
+
+
+isNumberInRange : Int -> Int -> Maybe String -> Bool
+isNumberInRange min max str =
+    case str of
+        Just value ->
+            case String.toInt value of
+                Just num ->
+                    min <= num && num <= max
+                Nothing ->
+                    False
+        Nothing ->
+            False
+
+
+checkHgt : Passport -> Bool
+checkHgt pass =
+    case getField "hgt" pass of
+        Just value ->
+            case Parser.run parseHgt value of
+                Ok hgt ->
+                    case hgt.metric of
+                        "cm" ->
+                            150 <= hgt.value && hgt.value <= 193
+                        "in" ->
+                            59 <= hgt.value && hgt.value <= 76
+                        _ ->
+                            False
+                _ ->
+                    False
+        Nothing ->
+            False
+
+
+parseHgt : Parser Height
+parseHgt =
+    succeed Height
+        |= int
+        |= letters
+
+
+checkHcl : Passport -> Bool
+checkHcl pass =
+    case getField "hcl" pass of
+        Just value ->
+            case Parser.run parseHcl value of
+                Ok { color } ->
+                    let
+                        check =
+                            \chr acc ->
+                                acc && Char.isHexDigit chr
+                        hexes =
+                            String.toList color
+                    in
+                    List.foldl check True hexes
+                        |> (&&) (List.length hexes == 6)
+                _ ->
+                    False
+        Nothing ->
+            False
+
+
+parseHcl : Parser HairColor
+parseHcl =
+    succeed HairColor
+        |. symbol "#"
+        |= (stringEntry Char.isHexDigit)
+
+
+checkEcl : Passport -> Bool
+checkEcl pass =
+    case getField "ecl" pass of
+        Just value ->
+            List.member value ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
+        Nothing ->
+            False
+
+
+checkPid : Passport -> Bool
+checkPid pass =
+    case getField "pid" pass of
+        Just value ->
+            let
+                check =
+                    \chr acc ->
+                        acc && Char.isDigit chr
+                digits =
+                    String.toList value
+            in
+            List.length digits == 9
+                |> (&&) (List.foldl check True digits)
+        Nothing ->
+            False
+
+
+getField : String -> Passport -> Maybe String
+getField name pass =
+    let
+        get =
+            \compare { key, value } acc ->
+                if acc /= Nothing then
+                    acc
+                else if key == compare then
+                    Just value
+                else
+                    Nothing
+    in
+    List.foldl (get name) Nothing pass
+
+
 containsField : String -> Passport -> Bool
 containsField name pass =
-    let
-        match =
-            \compare { key } acc ->
-                acc || compare == key
-    in
-    List.foldl (match name) False pass
+    case getField name pass of
+        Just _ -> True
+        Nothing -> False
 

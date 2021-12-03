@@ -4485,7 +4485,7 @@ function _Browser_load(url)
 		}
 	}));
 }
-var $author$project$Main$defaultContent = 'ecl:gry pid:860033327 eyr:2020 hcl:#fffffd\nbyr:1937 iyr:2017 cid:147 hgt:183cm\n\niyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884\nhcl:#cfa07d byr:1929\n\nhcl:#ae17e1 iyr:2013\neyr:2024\necl:brn pid:760753108 byr:1931\nhgt:179cm\n\nhcl:#cfa07d eyr:2025 pid:166559648\niyr:2011 ecl:brn hgt:59in';
+var $author$project$Main$defaultContent = 'pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980\nhcl:#623a2f\n\neyr:2029 ecl:blu cid:129 byr:1989\niyr:2014 pid:896056539 hcl:#a97842 hgt:165cm\n\nhcl:#888785\nhgt:164cm byr:2001 iyr:2015 cid:88\npid:545766238 ecl:hzl\neyr:2022\n\niyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719\n\neyr:1972 cid:100\nhcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926\n\niyr:2019\nhcl:#602927 eyr:1967 hgt:170cm\necl:grn pid:012533040 byr:1946\n\nhcl:dab227 iyr:2012\necl:brn hgt:182cm pid:021572410 eyr:2020 byr:1992 cid:277\n\nhgt:59cm ecl:zzz\neyr:2038 hcl:74454a iyr:2023\npid:3556412378 byr:2007';
 var $elm$core$List$cons = _List_cons;
 var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
 var $elm$core$Array$foldr = F3(
@@ -4829,11 +4829,51 @@ var $elm$parser$Parser$Advanced$keeper = F2(
 		return A3($elm$parser$Parser$Advanced$map2, $elm$core$Basics$apL, parseFunc, parseArg);
 	});
 var $elm$parser$Parser$keeper = $elm$parser$Parser$Advanced$keeper;
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $elm$parser$Parser$UnexpectedChar = {$: 'UnexpectedChar'};
+var $elm$parser$Parser$Advanced$AddRight = F2(
+	function (a, b) {
+		return {$: 'AddRight', a: a, b: b};
+	});
+var $elm$parser$Parser$Advanced$DeadEnd = F4(
+	function (row, col, problem, contextStack) {
+		return {col: col, contextStack: contextStack, problem: problem, row: row};
+	});
+var $elm$parser$Parser$Advanced$Empty = {$: 'Empty'};
+var $elm$parser$Parser$Advanced$fromState = F2(
+	function (s, x) {
+		return A2(
+			$elm$parser$Parser$Advanced$AddRight,
+			$elm$parser$Parser$Advanced$Empty,
+			A4($elm$parser$Parser$Advanced$DeadEnd, s.row, s.col, x, s.context));
+	});
 var $elm$parser$Parser$Advanced$isSubChar = _Parser_isSubChar;
-var $elm$core$Basics$lt = _Utils_lt;
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
+var $elm$parser$Parser$Advanced$chompIf = F2(
+	function (isGood, expecting) {
+		return $elm$parser$Parser$Advanced$Parser(
+			function (s) {
+				var newOffset = A3($elm$parser$Parser$Advanced$isSubChar, isGood, s.offset, s.src);
+				return _Utils_eq(newOffset, -1) ? A2(
+					$elm$parser$Parser$Advanced$Bad,
+					false,
+					A2($elm$parser$Parser$Advanced$fromState, s, expecting)) : (_Utils_eq(newOffset, -2) ? A3(
+					$elm$parser$Parser$Advanced$Good,
+					true,
+					_Utils_Tuple0,
+					{col: 1, context: s.context, indent: s.indent, offset: s.offset + 1, row: s.row + 1, src: s.src}) : A3(
+					$elm$parser$Parser$Advanced$Good,
+					true,
+					_Utils_Tuple0,
+					{col: s.col + 1, context: s.context, indent: s.indent, offset: newOffset, row: s.row, src: s.src}));
+			});
+	});
+var $elm$parser$Parser$chompIf = function (isGood) {
+	return A2($elm$parser$Parser$Advanced$chompIf, isGood, $elm$parser$Parser$UnexpectedChar);
+};
+var $elm$core$Basics$lt = _Utils_lt;
 var $elm$parser$Parser$Advanced$chompWhileHelp = F5(
 	function (isGood, offset, row, col, s0) {
 		chompWhileHelp:
@@ -4911,7 +4951,6 @@ var $elm$parser$Parser$Advanced$getChompedString = function (parser) {
 	return A2($elm$parser$Parser$Advanced$mapChompedString, $elm$core$Basics$always, parser);
 };
 var $elm$parser$Parser$getChompedString = $elm$parser$Parser$Advanced$getChompedString;
-var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$parser$Parser$Advanced$succeed = function (a) {
 	return $elm$parser$Parser$Advanced$Parser(
 		function (s) {
@@ -4919,35 +4958,22 @@ var $elm$parser$Parser$Advanced$succeed = function (a) {
 		});
 };
 var $elm$parser$Parser$succeed = $elm$parser$Parser$Advanced$succeed;
-var $author$project$Main$parseFieldElement = $elm$parser$Parser$getChompedString(
-	A2(
-		$elm$parser$Parser$ignorer,
-		$elm$parser$Parser$succeed(_Utils_Tuple0),
-		$elm$parser$Parser$chompWhile(
-			$elm$core$Basics$neq(
-				_Utils_chr(':')))));
+var $author$project$Utils$stringEntry = function (check) {
+	return $elm$parser$Parser$getChompedString(
+		A2(
+			$elm$parser$Parser$ignorer,
+			A2(
+				$elm$parser$Parser$ignorer,
+				$elm$parser$Parser$succeed(_Utils_Tuple0),
+				$elm$parser$Parser$chompIf(check)),
+			$elm$parser$Parser$chompWhile(check)));
+};
 var $elm$parser$Parser$ExpectingSymbol = function (a) {
 	return {$: 'ExpectingSymbol', a: a};
 };
 var $elm$parser$Parser$Advanced$Token = F2(
 	function (a, b) {
 		return {$: 'Token', a: a, b: b};
-	});
-var $elm$parser$Parser$Advanced$AddRight = F2(
-	function (a, b) {
-		return {$: 'AddRight', a: a, b: b};
-	});
-var $elm$parser$Parser$Advanced$DeadEnd = F4(
-	function (row, col, problem, contextStack) {
-		return {col: col, contextStack: contextStack, problem: problem, row: row};
-	});
-var $elm$parser$Parser$Advanced$Empty = {$: 'Empty'};
-var $elm$parser$Parser$Advanced$fromState = F2(
-	function (s, x) {
-		return A2(
-			$elm$parser$Parser$Advanced$AddRight,
-			$elm$parser$Parser$Advanced$Empty,
-			A4($elm$parser$Parser$Advanced$DeadEnd, s.row, s.col, x, s.context));
 	});
 var $elm$parser$Parser$Advanced$isSubString = _Parser_isSubString;
 var $elm$parser$Parser$Advanced$token = function (_v0) {
@@ -4985,9 +5011,13 @@ var $author$project$Main$parseField = A2(
 		$elm$parser$Parser$succeed($author$project$Main$Field),
 		A2(
 			$elm$parser$Parser$ignorer,
-			$author$project$Main$parseFieldElement,
+			$author$project$Utils$stringEntry(
+				$elm$core$Basics$neq(
+					_Utils_chr(':'))),
 			$elm$parser$Parser$symbol(':'))),
-	$author$project$Main$parseFieldElement);
+	$author$project$Utils$stringEntry(
+		$elm$core$Basics$neq(
+			_Utils_chr(':'))));
 var $elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
 };
@@ -5759,33 +5789,378 @@ var $elm$html$Html$Attributes$rows = function (n) {
 		'rows',
 		$elm$core$String$fromInt(n));
 };
-var $author$project$Main$containsField = F2(
+var $author$project$Main$countValidPassports = F2(
+	function (check, passports) {
+		var step = F2(
+			function (pass, acc) {
+				return acc + (check(pass) ? 1 : 0);
+			});
+		return A3($elm$core$List$foldl, step, 0, passports);
+	});
+var $author$project$Main$getField = F2(
 	function (name, pass) {
-		var match = F3(
+		var get = F3(
 			function (compare, _v0, acc) {
 				var key = _v0.key;
-				return acc || _Utils_eq(compare, key);
+				var value = _v0.value;
+				return (!_Utils_eq(acc, $elm$core$Maybe$Nothing)) ? acc : (_Utils_eq(key, compare) ? $elm$core$Maybe$Just(value) : $elm$core$Maybe$Nothing);
 			});
 		return A3(
 			$elm$core$List$foldl,
-			match(name),
-			false,
+			get(name),
+			$elm$core$Maybe$Nothing,
 			pass);
 	});
-var $author$project$Main$isValidPassport = function (pass) {
+var $author$project$Main$containsField = F2(
+	function (name, pass) {
+		var _v0 = A2($author$project$Main$getField, name, pass);
+		if (_v0.$ === 'Just') {
+			return true;
+		} else {
+			return false;
+		}
+	});
+var $author$project$Main$isValidPassport1 = function (pass) {
 	return A2($author$project$Main$containsField, 'pid', pass) && (A2($author$project$Main$containsField, 'ecl', pass) && (A2($author$project$Main$containsField, 'hcl', pass) && (A2($author$project$Main$containsField, 'hgt', pass) && (A2($author$project$Main$containsField, 'eyr', pass) && (A2($author$project$Main$containsField, 'iyr', pass) && A2($author$project$Main$containsField, 'byr', pass))))));
 };
 var $author$project$Main$solution1 = function (_v0) {
 	var input = _v0.input;
-	var step = F2(
-		function (pass, acc) {
-			return acc + ($author$project$Main$isValidPassport(pass) ? 1 : 0);
+	return A2($author$project$Main$countValidPassports, $author$project$Main$isValidPassport1, input);
+};
+var $author$project$Main$isNumberInRange = F3(
+	function (min, max, str) {
+		if (str.$ === 'Just') {
+			var value = str.a;
+			var _v1 = $elm$core$String$toInt(value);
+			if (_v1.$ === 'Just') {
+				var num = _v1.a;
+				return (_Utils_cmp(min, num) < 1) && (_Utils_cmp(num, max) < 1);
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	});
+var $author$project$Main$checkByr = function (pass) {
+	return A3(
+		$author$project$Main$isNumberInRange,
+		1920,
+		2002,
+		A2($author$project$Main$getField, 'byr', pass));
+};
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $author$project$Main$checkEcl = function (pass) {
+	var _v0 = A2($author$project$Main$getField, 'ecl', pass);
+	if (_v0.$ === 'Just') {
+		var value = _v0.a;
+		return A2(
+			$elm$core$List$member,
+			value,
+			_List_fromArray(
+				['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth']));
+	} else {
+		return false;
+	}
+};
+var $author$project$Main$checkEyr = function (pass) {
+	return A3(
+		$author$project$Main$isNumberInRange,
+		2020,
+		2030,
+		A2($author$project$Main$getField, 'eyr', pass));
+};
+var $elm$core$Char$isHexDigit = function (_char) {
+	var code = $elm$core$Char$toCode(_char);
+	return ((48 <= code) && (code <= 57)) || (((65 <= code) && (code <= 70)) || ((97 <= code) && (code <= 102)));
+};
+var $author$project$Main$HairColor = function (color) {
+	return {color: color};
+};
+var $author$project$Main$parseHcl = A2(
+	$elm$parser$Parser$keeper,
+	A2(
+		$elm$parser$Parser$ignorer,
+		$elm$parser$Parser$succeed($author$project$Main$HairColor),
+		$elm$parser$Parser$symbol('#')),
+	$author$project$Utils$stringEntry($elm$core$Char$isHexDigit));
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $author$project$Main$checkHcl = function (pass) {
+	var _v0 = A2($author$project$Main$getField, 'hcl', pass);
+	if (_v0.$ === 'Just') {
+		var value = _v0.a;
+		var _v1 = A2($elm$parser$Parser$run, $author$project$Main$parseHcl, value);
+		if (_v1.$ === 'Ok') {
+			var color = _v1.a.color;
+			var hexes = $elm$core$String$toList(color);
+			var check = F2(
+				function (chr, acc) {
+					return acc && $elm$core$Char$isHexDigit(chr);
+				});
+			return ($elm$core$List$length(hexes) === 6) && A3($elm$core$List$foldl, check, true, hexes);
+		} else {
+			return false;
+		}
+	} else {
+		return false;
+	}
+};
+var $author$project$Main$Height = F2(
+	function (value, metric) {
+		return {metric: metric, value: value};
+	});
+var $elm$parser$Parser$ExpectingInt = {$: 'ExpectingInt'};
+var $elm$parser$Parser$Advanced$consumeBase = _Parser_consumeBase;
+var $elm$parser$Parser$Advanced$consumeBase16 = _Parser_consumeBase16;
+var $elm$parser$Parser$Advanced$bumpOffset = F2(
+	function (newOffset, s) {
+		return {col: s.col + (newOffset - s.offset), context: s.context, indent: s.indent, offset: newOffset, row: s.row, src: s.src};
+	});
+var $elm$parser$Parser$Advanced$chompBase10 = _Parser_chompBase10;
+var $elm$parser$Parser$Advanced$isAsciiCode = _Parser_isAsciiCode;
+var $elm$parser$Parser$Advanced$consumeExp = F2(
+	function (offset, src) {
+		if (A3($elm$parser$Parser$Advanced$isAsciiCode, 101, offset, src) || A3($elm$parser$Parser$Advanced$isAsciiCode, 69, offset, src)) {
+			var eOffset = offset + 1;
+			var expOffset = (A3($elm$parser$Parser$Advanced$isAsciiCode, 43, eOffset, src) || A3($elm$parser$Parser$Advanced$isAsciiCode, 45, eOffset, src)) ? (eOffset + 1) : eOffset;
+			var newOffset = A2($elm$parser$Parser$Advanced$chompBase10, expOffset, src);
+			return _Utils_eq(expOffset, newOffset) ? (-newOffset) : newOffset;
+		} else {
+			return offset;
+		}
+	});
+var $elm$parser$Parser$Advanced$consumeDotAndExp = F2(
+	function (offset, src) {
+		return A3($elm$parser$Parser$Advanced$isAsciiCode, 46, offset, src) ? A2(
+			$elm$parser$Parser$Advanced$consumeExp,
+			A2($elm$parser$Parser$Advanced$chompBase10, offset + 1, src),
+			src) : A2($elm$parser$Parser$Advanced$consumeExp, offset, src);
+	});
+var $elm$parser$Parser$Advanced$finalizeInt = F5(
+	function (invalid, handler, startOffset, _v0, s) {
+		var endOffset = _v0.a;
+		var n = _v0.b;
+		if (handler.$ === 'Err') {
+			var x = handler.a;
+			return A2(
+				$elm$parser$Parser$Advanced$Bad,
+				true,
+				A2($elm$parser$Parser$Advanced$fromState, s, x));
+		} else {
+			var toValue = handler.a;
+			return _Utils_eq(startOffset, endOffset) ? A2(
+				$elm$parser$Parser$Advanced$Bad,
+				_Utils_cmp(s.offset, startOffset) < 0,
+				A2($elm$parser$Parser$Advanced$fromState, s, invalid)) : A3(
+				$elm$parser$Parser$Advanced$Good,
+				true,
+				toValue(n),
+				A2($elm$parser$Parser$Advanced$bumpOffset, endOffset, s));
+		}
+	});
+var $elm$parser$Parser$Advanced$fromInfo = F4(
+	function (row, col, x, context) {
+		return A2(
+			$elm$parser$Parser$Advanced$AddRight,
+			$elm$parser$Parser$Advanced$Empty,
+			A4($elm$parser$Parser$Advanced$DeadEnd, row, col, x, context));
+	});
+var $elm$core$String$toFloat = _String_toFloat;
+var $elm$parser$Parser$Advanced$finalizeFloat = F6(
+	function (invalid, expecting, intSettings, floatSettings, intPair, s) {
+		var intOffset = intPair.a;
+		var floatOffset = A2($elm$parser$Parser$Advanced$consumeDotAndExp, intOffset, s.src);
+		if (floatOffset < 0) {
+			return A2(
+				$elm$parser$Parser$Advanced$Bad,
+				true,
+				A4($elm$parser$Parser$Advanced$fromInfo, s.row, s.col - (floatOffset + s.offset), invalid, s.context));
+		} else {
+			if (_Utils_eq(s.offset, floatOffset)) {
+				return A2(
+					$elm$parser$Parser$Advanced$Bad,
+					false,
+					A2($elm$parser$Parser$Advanced$fromState, s, expecting));
+			} else {
+				if (_Utils_eq(intOffset, floatOffset)) {
+					return A5($elm$parser$Parser$Advanced$finalizeInt, invalid, intSettings, s.offset, intPair, s);
+				} else {
+					if (floatSettings.$ === 'Err') {
+						var x = floatSettings.a;
+						return A2(
+							$elm$parser$Parser$Advanced$Bad,
+							true,
+							A2($elm$parser$Parser$Advanced$fromState, s, invalid));
+					} else {
+						var toValue = floatSettings.a;
+						var _v1 = $elm$core$String$toFloat(
+							A3($elm$core$String$slice, s.offset, floatOffset, s.src));
+						if (_v1.$ === 'Nothing') {
+							return A2(
+								$elm$parser$Parser$Advanced$Bad,
+								true,
+								A2($elm$parser$Parser$Advanced$fromState, s, invalid));
+						} else {
+							var n = _v1.a;
+							return A3(
+								$elm$parser$Parser$Advanced$Good,
+								true,
+								toValue(n),
+								A2($elm$parser$Parser$Advanced$bumpOffset, floatOffset, s));
+						}
+					}
+				}
+			}
+		}
+	});
+var $elm$parser$Parser$Advanced$number = function (c) {
+	return $elm$parser$Parser$Advanced$Parser(
+		function (s) {
+			if (A3($elm$parser$Parser$Advanced$isAsciiCode, 48, s.offset, s.src)) {
+				var zeroOffset = s.offset + 1;
+				var baseOffset = zeroOffset + 1;
+				return A3($elm$parser$Parser$Advanced$isAsciiCode, 120, zeroOffset, s.src) ? A5(
+					$elm$parser$Parser$Advanced$finalizeInt,
+					c.invalid,
+					c.hex,
+					baseOffset,
+					A2($elm$parser$Parser$Advanced$consumeBase16, baseOffset, s.src),
+					s) : (A3($elm$parser$Parser$Advanced$isAsciiCode, 111, zeroOffset, s.src) ? A5(
+					$elm$parser$Parser$Advanced$finalizeInt,
+					c.invalid,
+					c.octal,
+					baseOffset,
+					A3($elm$parser$Parser$Advanced$consumeBase, 8, baseOffset, s.src),
+					s) : (A3($elm$parser$Parser$Advanced$isAsciiCode, 98, zeroOffset, s.src) ? A5(
+					$elm$parser$Parser$Advanced$finalizeInt,
+					c.invalid,
+					c.binary,
+					baseOffset,
+					A3($elm$parser$Parser$Advanced$consumeBase, 2, baseOffset, s.src),
+					s) : A6(
+					$elm$parser$Parser$Advanced$finalizeFloat,
+					c.invalid,
+					c.expecting,
+					c._int,
+					c._float,
+					_Utils_Tuple2(zeroOffset, 0),
+					s)));
+			} else {
+				return A6(
+					$elm$parser$Parser$Advanced$finalizeFloat,
+					c.invalid,
+					c.expecting,
+					c._int,
+					c._float,
+					A3($elm$parser$Parser$Advanced$consumeBase, 10, s.offset, s.src),
+					s);
+			}
 		});
-	return A3($elm$core$List$foldl, step, 0, input);
+};
+var $elm$parser$Parser$Advanced$int = F2(
+	function (expecting, invalid) {
+		return $elm$parser$Parser$Advanced$number(
+			{
+				binary: $elm$core$Result$Err(invalid),
+				expecting: expecting,
+				_float: $elm$core$Result$Err(invalid),
+				hex: $elm$core$Result$Err(invalid),
+				_int: $elm$core$Result$Ok($elm$core$Basics$identity),
+				invalid: invalid,
+				octal: $elm$core$Result$Err(invalid)
+			});
+	});
+var $elm$parser$Parser$int = A2($elm$parser$Parser$Advanced$int, $elm$parser$Parser$ExpectingInt, $elm$parser$Parser$ExpectingInt);
+var $author$project$Utils$letters = $author$project$Utils$stringEntry($elm$core$Char$isAlpha);
+var $author$project$Main$parseHgt = A2(
+	$elm$parser$Parser$keeper,
+	A2(
+		$elm$parser$Parser$keeper,
+		$elm$parser$Parser$succeed($author$project$Main$Height),
+		$elm$parser$Parser$int),
+	$author$project$Utils$letters);
+var $author$project$Main$checkHgt = function (pass) {
+	var _v0 = A2($author$project$Main$getField, 'hgt', pass);
+	if (_v0.$ === 'Just') {
+		var value = _v0.a;
+		var _v1 = A2($elm$parser$Parser$run, $author$project$Main$parseHgt, value);
+		if (_v1.$ === 'Ok') {
+			var hgt = _v1.a;
+			var _v2 = hgt.metric;
+			switch (_v2) {
+				case 'cm':
+					return (150 <= hgt.value) && (hgt.value <= 193);
+				case 'in':
+					return (59 <= hgt.value) && (hgt.value <= 76);
+				default:
+					return false;
+			}
+		} else {
+			return false;
+		}
+	} else {
+		return false;
+	}
+};
+var $author$project$Main$checkIyr = function (pass) {
+	return A3(
+		$author$project$Main$isNumberInRange,
+		2010,
+		2020,
+		A2($author$project$Main$getField, 'iyr', pass));
+};
+var $author$project$Main$checkPid = function (pass) {
+	var _v0 = A2($author$project$Main$getField, 'pid', pass);
+	if (_v0.$ === 'Just') {
+		var value = _v0.a;
+		var digits = $elm$core$String$toList(value);
+		var check = F2(
+			function (chr, acc) {
+				return acc && $elm$core$Char$isDigit(chr);
+			});
+		return A3($elm$core$List$foldl, check, true, digits) && ($elm$core$List$length(digits) === 9);
+	} else {
+		return false;
+	}
+};
+var $author$project$Main$isValidPassport2 = function (pass) {
+	return $author$project$Main$checkPid(pass) && ($author$project$Main$checkEcl(pass) && ($author$project$Main$checkHcl(pass) && ($author$project$Main$checkHgt(pass) && ($author$project$Main$checkEyr(pass) && ($author$project$Main$checkIyr(pass) && $author$project$Main$checkByr(pass))))));
 };
 var $author$project$Main$solution2 = function (_v0) {
 	var input = _v0.input;
-	return 0;
+	return A2($author$project$Main$countValidPassports, $author$project$Main$isValidPassport2, input);
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
