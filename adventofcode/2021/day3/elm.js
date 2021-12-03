@@ -5337,9 +5337,29 @@ var $icidasset$elm_binary$Binary$fromIntegers = A2(
 			return A3($icidasset$elm_binary$Binary$ifThenElse, i <= 0, false, true);
 		}),
 	$icidasset$elm_binary$Binary$Bits);
+var $author$project$Main$Neither = {$: 'Neither'};
+var $author$project$Main$One = {$: 'One'};
+var $author$project$Main$Zero = {$: 'Zero'};
 var $elm$core$List$sum = function (numbers) {
 	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
 };
+var $author$project$Main$commonBit = function (list) {
+	var ones = $elm$core$List$sum(list);
+	var zeroes = $elm$core$List$length(list) - ones;
+	return _Utils_eq(ones, zeroes) ? $author$project$Main$Neither : ((_Utils_cmp(ones, zeroes) > 0) ? $author$project$Main$One : $author$project$Main$Zero);
+};
+var $author$project$Main$leastCommonBit = F2(
+	function (_default, list) {
+		var _v0 = $author$project$Main$commonBit(list);
+		switch (_v0.$) {
+			case 'One':
+				return 0;
+			case 'Zero':
+				return 1;
+			default:
+				return _default;
+		}
+	});
 var $elm$core$Basics$pow = _Basics_pow;
 var $icidasset$elm_binary$Binary$toDecimal = function (_v0) {
 	var bits = _v0.a;
@@ -5359,30 +5379,32 @@ var $icidasset$elm_binary$Binary$toDecimal = function (_v0) {
 		bits).a;
 };
 var $author$project$Main$epsilonRate = function (hrzInput) {
-	var bit = function (list) {
-		return (_Utils_cmp(
-			$elm$core$List$sum(list),
-			($elm$core$List$length(list) / 2) | 0) < 0) ? 1 : 0;
-	};
-	var bits = function (input) {
-		return A2($elm$core$List$map, bit, input);
-	};
 	return $icidasset$elm_binary$Binary$toDecimal(
 		$icidasset$elm_binary$Binary$fromIntegers(
-			bits(hrzInput)));
+			A2(
+				$elm$core$List$map,
+				$author$project$Main$leastCommonBit(0),
+				hrzInput)));
 };
+var $author$project$Main$mostCommonBit = F2(
+	function (_default, list) {
+		var _v0 = $author$project$Main$commonBit(list);
+		switch (_v0.$) {
+			case 'One':
+				return 1;
+			case 'Zero':
+				return 0;
+			default:
+				return _default;
+		}
+	});
 var $author$project$Main$gammaRate = function (hrzInput) {
-	var bit = function (list) {
-		return (_Utils_cmp(
-			$elm$core$List$sum(list),
-			($elm$core$List$length(list) / 2) | 0) > 0) ? 1 : 0;
-	};
-	var bits = function (input) {
-		return A2($elm$core$List$map, bit, input);
-	};
 	return $icidasset$elm_binary$Binary$toDecimal(
 		$icidasset$elm_binary$Binary$fromIntegers(
-			bits(hrzInput)));
+			A2(
+				$elm$core$List$map,
+				$author$project$Main$mostCommonBit(1),
+				hrzInput)));
 };
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {

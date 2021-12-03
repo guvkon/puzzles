@@ -102,36 +102,52 @@ getElem index line =
         Nothing -> 0
 
 
+type CommonBit = Zero | One | Neither
+
+
+commonBit : List Int -> CommonBit
+commonBit list =
+    let
+        ones =
+            List.sum list
+        zeroes =
+            List.length list - ones
+    in
+    if ones == zeroes then
+        Neither
+    else if ones > zeroes then
+        One
+    else
+        Zero
+
+
+mostCommonBit : Int -> List Int -> Int
+mostCommonBit default list =
+    case commonBit list of
+        One -> 1
+        Zero -> 0
+        Neither -> default
+
+
+leastCommonBit : Int -> List Int -> Int
+leastCommonBit default list =
+    case commonBit list of
+        One -> 0
+        Zero -> 1
+        Neither -> default
+
+
 gammaRate : List (List Int) -> Int
 gammaRate hrzInput =
-    let
-        bit =
-            \list ->
-                if List.sum list > List.length list // 2 then
-                    1
-                else
-                    0
-        bits =
-            \input ->
-                List.map bit input
-    in
-    Binary.toDecimal (Binary.fromIntegers (bits hrzInput))
+    List.map (mostCommonBit 1) hrzInput
+        |> Binary.fromIntegers
+        |> Binary.toDecimal
 
 
 epsilonRate : List (List Int) -> Int
 epsilonRate hrzInput =
-    let
-        bit =
-            \list ->
-                if List.sum list < List.length list // 2 then
-                    1
-                else
-                    0
-        bits =
-            \input ->
-                List.map bit input
-    in
-    Binary.toDecimal (Binary.fromIntegers (bits hrzInput))
-    
+    List.map (leastCommonBit 0) hrzInput
+        |> Binary.fromIntegers
+        |> Binary.toDecimal
 
 
