@@ -5525,9 +5525,9 @@ var $elm$core$List$sort = function (xs) {
 };
 var $author$project$Main$solution2 = function (_v0) {
 	var input = _v0.input;
-	var sortedSeatIds = $elm$core$List$sort(
-		A2($elm$core$List$map, $author$project$Main$seatId, input));
-	return $author$project$Main$findMissing(sortedSeatIds);
+	return $author$project$Main$findMissing(
+		$elm$core$List$sort(
+			A2($elm$core$List$map, $author$project$Main$seatId, input)));
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;

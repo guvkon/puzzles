@@ -106,7 +106,7 @@ solution1 { input } =
     let
         maybeMax =
             List.map seatId input
-                    |> List.maximum
+                |> List.maximum
     in
     case maybeMax of
         Just val -> val
@@ -116,12 +116,9 @@ solution1 { input } =
 
 solution2 : Model -> Int
 solution2 { input } =
-    let
-        sortedSeatIds =
-            List.map seatId input
-                |> List.sort
-    in
-    findMissing sortedSeatIds
+    List.map seatId input
+        |> List.sort
+        |> findMissing
 
 
 findMissing : List Int -> Int
