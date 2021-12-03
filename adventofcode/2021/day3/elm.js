@@ -5485,16 +5485,10 @@ var $elm$core$Array$get = F2(
 	});
 var $author$project$Main$getElem = F2(
 	function (index, line) {
-		var _v0 = A2(
+		return A2(
 			$elm$core$Array$get,
 			index,
 			$elm$core$Array$fromList(line));
-		if (_v0.$ === 'Just') {
-			var val = _v0.a;
-			return val;
-		} else {
-			return 0;
-		}
 	});
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
@@ -5528,7 +5522,7 @@ var $author$project$Main$horizontalInput = function (input) {
 			function (_v1) {
 				var idx = _v1.a;
 				return A2(
-					$elm$core$List$map,
+					$elm$core$List$filterMap,
 					$author$project$Main$getElem(idx),
 					input);
 			},
@@ -5543,8 +5537,90 @@ var $author$project$Main$solution1 = function (_v0) {
 	var hrzInput = $author$project$Main$horizontalInput(input);
 	return $author$project$Main$epsilonRate(hrzInput) * $author$project$Main$gammaRate(hrzInput);
 };
-var $author$project$Main$solution2 = function (model) {
-	return 0;
+var $author$project$Main$decimal = function (bits) {
+	return $icidasset$elm_binary$Binary$toDecimal(
+		$icidasset$elm_binary$Binary$fromIntegers(bits));
+};
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $author$project$Main$getElemList = F2(
+	function (index, lines) {
+		return A2(
+			$elm$core$Array$get,
+			index,
+			$elm$core$Array$fromList(lines));
+	});
+var $author$project$Main$genericRating = F3(
+	function (compare, index, input) {
+		genericRating:
+		while (true) {
+			if (!input.b) {
+				return 0;
+			} else {
+				if (!input.b.b) {
+					var x = input.a;
+					return $author$project$Main$decimal(x);
+				} else {
+					var x = input.a;
+					var xs = input.b;
+					var _v1 = A2(
+						$author$project$Main$getElemList,
+						index,
+						$author$project$Main$horizontalInput(input));
+					if (_v1.$ === 'Just') {
+						var line = _v1.a;
+						var bit = compare(line);
+						var filtr = function (num) {
+							var _v2 = A2($author$project$Main$getElem, index, num);
+							if (_v2.$ === 'Just') {
+								var val = _v2.a;
+								return _Utils_eq(val, bit);
+							} else {
+								return false;
+							}
+						};
+						var $temp$compare = compare,
+							$temp$index = index + 1,
+							$temp$input = A2($elm$core$List$filter, filtr, input);
+						compare = $temp$compare;
+						index = $temp$index;
+						input = $temp$input;
+						continue genericRating;
+					} else {
+						return $author$project$Main$decimal(x);
+					}
+				}
+			}
+		}
+	});
+var $author$project$Main$co2Rating = F2(
+	function (index, input) {
+		return A3(
+			$author$project$Main$genericRating,
+			$author$project$Main$leastCommonBit(0),
+			index,
+			input);
+	});
+var $author$project$Main$oxygenRating = F2(
+	function (index, input) {
+		return A3(
+			$author$project$Main$genericRating,
+			$author$project$Main$mostCommonBit(1),
+			index,
+			input);
+	});
+var $author$project$Main$solution2 = function (_v0) {
+	var input = _v0.input;
+	return A2($author$project$Main$co2Rating, 0, input) * A2($author$project$Main$oxygenRating, 0, input);
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
