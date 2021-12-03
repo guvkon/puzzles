@@ -5503,16 +5503,15 @@ var $author$project$Utils$indexes = function (list) {
 		0,
 		$elm$core$List$length(list) - 1);
 };
-var $author$project$Main$horizontalInput = function (input) {
-	var step = function (idx) {
+var $author$project$Main$rotateInput = function (input) {
+	var step = function (index) {
 		return A2(
 			$elm$core$List$filterMap,
-			$author$project$Utils$element(idx),
+			$author$project$Utils$element(index),
 			input);
 	};
 	if (input.b) {
 		var x = input.a;
-		var xs = input.b;
 		return A2(
 			$elm$core$List$map,
 			step,
@@ -5523,7 +5522,7 @@ var $author$project$Main$horizontalInput = function (input) {
 };
 var $author$project$Main$solution1 = function (_v0) {
 	var input = _v0.input;
-	var hrzInput = $author$project$Main$horizontalInput(input);
+	var hrzInput = $author$project$Main$rotateInput(input);
 	return $author$project$Main$epsilonRate(hrzInput) * $author$project$Main$gammaRate(hrzInput);
 };
 var $elm$core$List$filter = F2(
@@ -5550,7 +5549,7 @@ var $author$project$Main$genericRating2 = F3(
 				var _v1 = A2(
 					$author$project$Utils$element,
 					index,
-					$author$project$Main$horizontalInput(input));
+					$author$project$Main$rotateInput(input));
 				if (_v1.$ === 'Just') {
 					var line = _v1.a;
 					var bit = compare(line);

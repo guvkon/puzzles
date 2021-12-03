@@ -88,15 +88,15 @@ parseInput str =
         |> List.map step
 
 
-horizontalInput : List (List Int) -> List (List Int)
-horizontalInput input =
+rotateInput : List (List Int) -> List (List Int)
+rotateInput input =
     let
         step =
-            \idx ->
-                List.filterMap (element idx) input
+            \index ->
+                List.filterMap (element index) input
     in
     case input of
-        x :: xs ->
+        x :: _ ->
             indexes x
                 |> List.map step
         [] -> []
@@ -106,7 +106,7 @@ solution1 : Model -> Int
 solution1 { input } =
     let
         hrzInput =
-            horizontalInput input
+            rotateInput input
     in
     gammaRate hrzInput
         |> (*) (epsilonRate hrzInput)
@@ -151,7 +151,7 @@ genericRating2 compare index input =
         x :: [] ->
             decimal x
         x :: _ ->
-            case element index (horizontalInput input)  of
+            case element index (rotateInput input)  of
                 Just line ->
                     let
                         bit =
@@ -203,5 +203,4 @@ commonBit list =
         One
     else
         Zero
-
 
