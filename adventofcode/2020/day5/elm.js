@@ -5494,9 +5494,40 @@ var $author$project$Main$solution1 = function (_v0) {
 		return -1;
 	}
 };
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$findMissing = function (ids) {
+	findMissing:
+	while (true) {
+		if (!ids.b) {
+			return 0;
+		} else {
+			if (!ids.b.b) {
+				return 0;
+			} else {
+				var x = ids.a;
+				var _v1 = ids.b;
+				var y = _v1.a;
+				var xs = _v1.b;
+				if (!_Utils_eq(x + 1, y)) {
+					return x + 1;
+				} else {
+					var $temp$ids = A2($elm$core$List$cons, y, xs);
+					ids = $temp$ids;
+					continue findMissing;
+				}
+			}
+		}
+	}
+};
+var $elm$core$List$sortBy = _List_sortBy;
+var $elm$core$List$sort = function (xs) {
+	return A2($elm$core$List$sortBy, $elm$core$Basics$identity, xs);
+};
 var $author$project$Main$solution2 = function (_v0) {
 	var input = _v0.input;
-	return 0;
+	var sortedSeatIds = $elm$core$List$sort(
+		A2($elm$core$List$map, $author$project$Main$seatId, input));
+	return $author$project$Main$findMissing(sortedSeatIds);
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;

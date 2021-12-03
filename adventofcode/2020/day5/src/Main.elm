@@ -116,7 +116,26 @@ solution1 { input } =
 
 solution2 : Model -> Int
 solution2 { input } =
-    0
+    let
+        sortedSeatIds =
+            List.map seatId input
+                |> List.sort
+    in
+    findMissing sortedSeatIds
+
+
+findMissing : List Int -> Int
+findMissing ids =
+    case ids of
+        [] ->
+            0
+        _ :: [] ->
+            0
+        x :: y :: xs ->
+            if x + 1 /= y then
+                x + 1
+            else
+                findMissing (y :: xs)
 
 
 seatId : BoardingPass -> Int
