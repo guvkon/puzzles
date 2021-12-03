@@ -4393,6 +4393,10 @@ var _Bitwise_shiftRightZfBy = F2(function(offset, a)
 	return a >>> offset;
 });
 var $author$project$Main$defaultContent = '00100\n11110\n10110\n10111\n10101\n01111\n00111\n11100\n10000\n11001\n00010\n01010';
+var $elm$core$Basics$apR = F2(
+	function (x, f) {
+		return f(x);
+	});
 var $elm$core$List$cons = _List_cons;
 var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
 var $elm$core$Array$foldr = F3(
@@ -4599,17 +4603,19 @@ var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
 var $author$project$Main$parseInput = function (str) {
+	var parseBit = function (_char) {
+		return $elm$core$String$toInt(
+			$elm$core$String$fromChar(_char));
+	};
+	var step = function (line) {
+		return A2(
+			$elm$core$List$filterMap,
+			parseBit,
+			$elm$core$String$toList(line));
+	};
 	return A2(
 		$elm$core$List$map,
-		function (line) {
-			return A2(
-				$elm$core$List$filterMap,
-				function (_char) {
-					return $elm$core$String$toInt(
-						$elm$core$String$fromChar(_char));
-				},
-				$elm$core$String$toList(line));
-		},
+		step,
 		$elm$core$String$lines(str));
 };
 var $author$project$Main$init = {
@@ -4852,10 +4858,6 @@ var $elm$core$Array$Leaf = function (a) {
 };
 var $elm$core$Basics$apL = F2(
 	function (f, x) {
-		return f(x);
-	});
-var $elm$core$Basics$apR = F2(
-	function (x, f) {
 		return f(x);
 	});
 var $elm$core$Basics$eq = _Utils_equal;
@@ -5355,13 +5357,13 @@ var $icidasset$elm_binary$Binary$toDecimal = function (_v0) {
 			$elm$core$List$length(bits) - 1),
 		bits).a;
 };
-var $author$project$Main$decimal = function (bits) {
+var $author$project$Utils$decimal = function (bits) {
 	return $icidasset$elm_binary$Binary$toDecimal(
 		$icidasset$elm_binary$Binary$fromIntegers(bits));
 };
 var $author$project$Main$genericRating1 = F2(
 	function (compare, hrzInput) {
-		return $author$project$Main$decimal(
+		return $author$project$Utils$decimal(
 			A2($elm$core$List$map, compare, hrzInput));
 	});
 var $author$project$Main$Neither = {$: 'Neither'};
@@ -5488,51 +5490,33 @@ var $elm$core$Array$get = F2(
 			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
 			A3($elm$core$Array$getHelp, startShift, index, tree)));
 	});
-var $author$project$Main$getElem = F2(
-	function (index, line) {
+var $author$project$Utils$element = F2(
+	function (index, list) {
 		return A2(
 			$elm$core$Array$get,
 			index,
-			$elm$core$Array$fromList(line));
+			$elm$core$Array$fromList(list));
 	});
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
-var $elm$core$Array$toIndexedList = function (array) {
-	var len = array.a;
-	var helper = F2(
-		function (entry, _v0) {
-			var index = _v0.a;
-			var list = _v0.b;
-			return _Utils_Tuple2(
-				index - 1,
-				A2(
-					$elm$core$List$cons,
-					_Utils_Tuple2(index, entry),
-					list));
-		});
-	return A3(
-		$elm$core$Array$foldr,
-		helper,
-		_Utils_Tuple2(len - 1, _List_Nil),
-		array).b;
+var $author$project$Utils$indexes = function (list) {
+	return A2(
+		$elm$core$List$range,
+		0,
+		$elm$core$List$length(list) - 1);
 };
 var $author$project$Main$horizontalInput = function (input) {
+	var step = function (idx) {
+		return A2(
+			$elm$core$List$filterMap,
+			$author$project$Utils$element(idx),
+			input);
+	};
 	if (input.b) {
 		var x = input.a;
 		var xs = input.b;
 		return A2(
 			$elm$core$List$map,
-			function (_v1) {
-				var idx = _v1.a;
-				return A2(
-					$elm$core$List$filterMap,
-					$author$project$Main$getElem(idx),
-					input);
-			},
-			$elm$core$Array$toIndexedList(
-				$elm$core$Array$fromList(x)));
+			step,
+			$author$project$Utils$indexes(x));
 	} else {
 		return _List_Nil;
 	}
@@ -5553,52 +5537,39 @@ var $elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
-var $author$project$Main$getElemList = F2(
-	function (index, lines) {
-		return A2(
-			$elm$core$Array$get,
-			index,
-			$elm$core$Array$fromList(lines));
-	});
 var $author$project$Main$genericRating2 = F3(
 	function (compare, index, input) {
-		genericRating2:
-		while (true) {
-			if (!input.b) {
-				return 0;
+		if (!input.b) {
+			return 0;
+		} else {
+			if (!input.b.b) {
+				var x = input.a;
+				return $author$project$Utils$decimal(x);
 			} else {
-				if (!input.b.b) {
-					var x = input.a;
-					return $author$project$Main$decimal(x);
+				var x = input.a;
+				var _v1 = A2(
+					$author$project$Utils$element,
+					index,
+					$author$project$Main$horizontalInput(input));
+				if (_v1.$ === 'Just') {
+					var line = _v1.a;
+					var bit = compare(line);
+					var filter = function (num) {
+						var _v2 = A2($author$project$Utils$element, index, num);
+						if (_v2.$ === 'Just') {
+							var val = _v2.a;
+							return _Utils_eq(val, bit);
+						} else {
+							return false;
+						}
+					};
+					return A3(
+						$author$project$Main$genericRating2,
+						compare,
+						index + 1,
+						A2($elm$core$List$filter, filter, input));
 				} else {
-					var x = input.a;
-					var xs = input.b;
-					var _v1 = A2(
-						$author$project$Main$getElemList,
-						index,
-						$author$project$Main$horizontalInput(input));
-					if (_v1.$ === 'Just') {
-						var line = _v1.a;
-						var bit = compare(line);
-						var filtr = function (num) {
-							var _v2 = A2($author$project$Main$getElem, index, num);
-							if (_v2.$ === 'Just') {
-								var val = _v2.a;
-								return _Utils_eq(val, bit);
-							} else {
-								return false;
-							}
-						};
-						var $temp$compare = compare,
-							$temp$index = index + 1,
-							$temp$input = A2($elm$core$List$filter, filtr, input);
-						compare = $temp$compare;
-						index = $temp$index;
-						input = $temp$input;
-						continue genericRating2;
-					} else {
-						return $author$project$Main$decimal(x);
-					}
+					return $author$project$Utils$decimal(x);
 				}
 			}
 		}

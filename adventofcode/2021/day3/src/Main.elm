@@ -1,11 +1,10 @@
 module Main exposing (..)
 
-import Array
 import Browser
 import Html exposing (Html, Attribute, div, textarea, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
-import Binary
+import Utils exposing (decimal, indexes, element)
 
 
 -- MAIN
@@ -54,7 +53,13 @@ update msg model =
 view : Model -> Html Msg
 view model =
   div []
-    [ textarea [ placeholder "Input", value model.content, onInput Change, rows 20, cols 40, class "bg-dark text-light border-1 border-secondary p-2" ] []
+    [ textarea [ placeholder "Input"
+               , value model.content
+               , onInput Change
+               , rows 20
+               , cols 40
+               , class "bg-dark text-light border-1 border-secondary p-2"
+               ] []
     , div [] [ text ( "Input size: " ++ String.fromInt ( List.length model.input ) ) ]
     , div [] [ text ( "Solution 1: " ++ String.fromInt ( solution1 model ) ) ]
     , div [] [ text ( "Solution 2: " ++ String.fromInt ( solution2 model ) ) ]
@@ -69,14 +74,31 @@ defaultContent = "00100\n11110\n10110\n10111\n10101\n01111\n00111\n11100\n10000\
 
 parseInput : String -> List (List Int)
 parseInput str =
-    List.map (\line -> List.filterMap (\char -> String.toInt (String.fromChar char)) (String.toList line)) (String.lines str)
+    let
+        parseBit =
+            \char ->
+                String.fromChar char
+                    |> String.toInt
+        step =
+            \line ->
+                String.toList line
+                    |> List.filterMap parseBit
+    in
+    String.lines str
+        |> List.map step
 
 
 horizontalInput : List (List Int) -> List (List Int)
 horizontalInput input =
+    let
+        step =
+            \idx ->
+                List.filterMap (element idx) input
+    in
     case input of
         x :: xs ->
-            List.map (\(idx, _) -> List.filterMap (getElem idx) input) (Array.toIndexedList (Array.fromList x))
+            indexes x
+                |> List.map step
         [] -> []
 
 
@@ -128,39 +150,24 @@ genericRating2 compare index input =
         [] -> 0
         x :: [] ->
             decimal x
-        x :: xs ->
-            case getElemList index (horizontalInput input)  of
+        x :: _ ->
+            case element index (horizontalInput input)  of
                 Just line ->
                     let
                         bit =
                             compare line
-                        filtr =
+                        filter =
                             \num ->
-                                case getElem index num of
+                                case element index num of
                                     Just val ->
                                         val == bit
                                     Nothing ->
                                         False
                     in
-                    genericRating2 compare (index + 1) (List.filter filtr input)
+                    List.filter filter input
+                        |> genericRating2 compare (index + 1)
                 Nothing ->
                     decimal x
-
-
-decimal : List Int -> Int
-decimal bits =
-    Binary.fromIntegers bits
-        |> Binary.toDecimal
-
-
-getElem : Int -> List Int -> Maybe Int
-getElem index line =
-    Array.get index (Array.fromList line)
-
-
-getElemList : Int -> List (List Int) -> Maybe (List Int)
-getElemList index lines =
-    Array.get index (Array.fromList lines)
 
 
 mostCommonBit : Int -> List Int -> Int
