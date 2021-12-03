@@ -59,7 +59,7 @@ view model =
                , onInput Change
                , rows 20
                , cols 40
-               , class "bg-dark text-light border-1 border-secondary p-2"
+               , class "bg-secondary text-light border-1 border-dark p-2"
                ] []
     , div [] [ text ( "Input size: " ++ String.fromInt ( List.length model.input ) ) ]
     , div [] [ text ( "Solution 1: " ++ String.fromInt ( solution1 model ) ) ]

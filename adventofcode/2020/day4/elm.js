@@ -6211,7 +6211,7 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$Events$onInput($author$project$Main$Change),
 						$elm$html$Html$Attributes$rows(20),
 						$elm$html$Html$Attributes$cols(40),
-						$elm$html$Html$Attributes$class('bg-dark text-light border-1 border-secondary p-2')
+						$elm$html$Html$Attributes$class('bg-secondary text-light border-1 border-dark p-2')
 					]),
 				_List_Nil),
 				A2(
