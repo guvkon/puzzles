@@ -73,7 +73,8 @@ defaultContent = "1721\n979\n366\n299\n675\n1456"
 
 parseInput : String -> List Int
 parseInput str =
-    List.filterMap String.toInt (String.lines str)
+    String.lines str
+        |> List.filterMap String.toInt
 
 
 solution1 : Model -> Int
@@ -118,8 +119,8 @@ findTriple : List Int -> Int -> Maybe Triple
 findTriple input target =
     case input of
         [] -> Nothing
-        x :: [] -> Nothing
-        x :: y :: [] -> Nothing
+        _ :: [] -> Nothing
+        _ :: _ :: [] -> Nothing
         x :: xs ->
             case findPair xs (target - x) of
                 Just (y, z) -> Just (x, y, z)

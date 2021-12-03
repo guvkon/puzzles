@@ -126,14 +126,14 @@ filterLines down lines =
 stepRight : Int -> Line -> (Int, Int) -> (Int, Int)
 stepRight step line (position, count) =
     let
-        isTree =
+        counter =
             \pos aLine ->
                 case Array.get (modBy (Array.length aLine) pos) aLine of
                     Just loc -> case loc of
-                        Tree -> True
-                        Open -> False
-                    Nothing -> False
+                        Tree -> 1
+                        Open -> 0
+                    Nothing -> 0
     in
-    (position + step, count + if isTree position (Array.fromList line) then 1 else 0)
+    (position + step, count + counter position (Array.fromList line))
 
 

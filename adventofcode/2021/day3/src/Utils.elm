@@ -1,7 +1,8 @@
-module Utils exposing (decimal, indexes, element)
+module Utils exposing (decimal, indexes, element, letters)
 
 import Array
 import Binary
+import Parser exposing (Parser, succeed, (|.), chompWhile, getChompedString)
 
 
 -- Binary
@@ -26,4 +27,19 @@ element index list =
     Array.fromList list
         |> Array.get index
 
+
+slice : Int -> Int -> List a -> List a
+slice start end list =
+    List.take (List.length list - end) list
+        |> List.drop start
+
+
+-- Parser
+
+
+letters : Parser String
+letters =
+    succeed ()
+        |. chompWhile Char.isAlpha
+        |> getChompedString
 
