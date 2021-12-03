@@ -5,7 +5,7 @@ import Html exposing (Html, Attribute, div, textarea, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import Parser exposing ((|.), (|=), Parser, int, succeed, symbol)
-import Utils exposing (letters, stringEntry)
+import Utils
 
 
 -- MAIN
@@ -161,9 +161,9 @@ stringsToPassport strings =
 parseField : Parser Field
 parseField =
     succeed Field
-        |= (stringEntry ((/=) ':'))
+        |= (Utils.stringEntry ((/=) ':'))
         |. symbol ":"
-        |= (stringEntry ((/=) ':'))
+        |= (Utils.stringEntry ((/=) ':'))
 
 
 solution1 : Model -> Int
@@ -263,7 +263,7 @@ parseHgt : Parser Height
 parseHgt =
     succeed Height
         |= int
-        |= letters
+        |= Utils.letters
 
 
 checkHcl : Passport -> Bool
@@ -291,7 +291,7 @@ parseHcl : Parser HairColor
 parseHcl =
     succeed HairColor
         |. symbol "#"
-        |= (stringEntry Char.isHexDigit)
+        |= (Utils.stringEntry Char.isHexDigit)
 
 
 checkEcl : Passport -> Bool
@@ -322,22 +322,11 @@ checkPid pass =
 
 getField : String -> Passport -> Maybe String
 getField name pass =
-    let
-        get =
-            \compare { key, value } acc ->
-                if acc /= Nothing then
-                    acc
-                else if key == compare then
-                    Just value
-                else
-                    Nothing
-    in
-    List.foldl (get name) Nothing pass
+    Utils.field (\val -> val.key) (\val -> val.value) name pass
 
 
 containsField : String -> Passport -> Bool
 containsField name pass =
-    case getField name pass of
-        Just _ -> True
-        Nothing -> False
+    getField name pass
+        |> Utils.exists
 

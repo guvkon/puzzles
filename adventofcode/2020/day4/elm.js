@@ -5797,28 +5797,58 @@ var $author$project$Main$countValidPassports = F2(
 			});
 		return A3($elm$core$List$foldl, step, 0, passports);
 	});
+var $author$project$Utils$exists = function (x) {
+	if (x.$ === 'Just') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $author$project$Utils$field = F4(
+	function (getKey, getValue, name, record) {
+		field:
+		while (true) {
+			if (!record.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var x = record.a;
+				var xs = record.b;
+				if (_Utils_eq(
+					getKey(x),
+					name)) {
+					return $elm$core$Maybe$Just(
+						getValue(x));
+				} else {
+					var $temp$getKey = getKey,
+						$temp$getValue = getValue,
+						$temp$name = name,
+						$temp$record = xs;
+					getKey = $temp$getKey;
+					getValue = $temp$getValue;
+					name = $temp$name;
+					record = $temp$record;
+					continue field;
+				}
+			}
+		}
+	});
 var $author$project$Main$getField = F2(
 	function (name, pass) {
-		var get = F3(
-			function (compare, _v0, acc) {
-				var key = _v0.key;
-				var value = _v0.value;
-				return (!_Utils_eq(acc, $elm$core$Maybe$Nothing)) ? acc : (_Utils_eq(key, compare) ? $elm$core$Maybe$Just(value) : $elm$core$Maybe$Nothing);
-			});
-		return A3(
-			$elm$core$List$foldl,
-			get(name),
-			$elm$core$Maybe$Nothing,
+		return A4(
+			$author$project$Utils$field,
+			function (val) {
+				return val.key;
+			},
+			function (val) {
+				return val.value;
+			},
+			name,
 			pass);
 	});
 var $author$project$Main$containsField = F2(
 	function (name, pass) {
-		var _v0 = A2($author$project$Main$getField, name, pass);
-		if (_v0.$ === 'Just') {
-			return true;
-		} else {
-			return false;
-		}
+		return $author$project$Utils$exists(
+			A2($author$project$Main$getField, name, pass));
 	});
 var $author$project$Main$isValidPassport1 = function (pass) {
 	return A2($author$project$Main$containsField, 'pid', pass) && (A2($author$project$Main$containsField, 'ecl', pass) && (A2($author$project$Main$containsField, 'hcl', pass) && (A2($author$project$Main$containsField, 'hgt', pass) && (A2($author$project$Main$containsField, 'eyr', pass) && (A2($author$project$Main$containsField, 'iyr', pass) && A2($author$project$Main$containsField, 'byr', pass))))));
