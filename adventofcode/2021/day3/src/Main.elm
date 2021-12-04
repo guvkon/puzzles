@@ -88,7 +88,7 @@ parseInput str =
         |> List.map step
 
 
-rotateInput : List (List Int) -> List (List Int)
+rotateInput : List (List a) -> List (List a)
 rotateInput input =
     let
         step =
