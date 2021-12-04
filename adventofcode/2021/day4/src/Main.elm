@@ -75,7 +75,9 @@ type alias Bingo = { numbers : List Int
                    }
 
 
-type alias Board = List (List Field)
+type alias Board = { id : String
+                   , board : List (List Field)
+                   }
 
 
 type alias Field = (Int, Bool)
@@ -128,8 +130,12 @@ parseInput str =
                 |> List.filterMap parseField
         parseBoard : String -> Board
         parseBoard string =
-            String.lines string
-                |> List.map parseRow
+            let
+                board =
+                    String.lines string
+                        |> List.map parseRow
+            in
+            { id = string, board = board }
         parseBoards : List String -> List Board
         parseBoards strings =
             strings
@@ -166,7 +172,7 @@ solution1 { input } =
     in
     case maybeWinner of
         Nothing ->
-            0
+            -1
         Just winner ->
             case winner of
                 (number, board) ->
@@ -176,26 +182,66 @@ solution1 { input } =
 
 solution2 : Model -> Int
 solution2 { input } =
-    0
+    let
+        winners =
+            findAllWinners input.numbers input.boards []
+        winnerScores =
+            List.map calculateScore winners
+    in
+    case List.head winnerScores of
+        Nothing ->
+            -1
+        Just score ->
+            score
+
+
+calculateScore : (Int, Board) -> Int
+calculateScore (number, board) =
+    calculateWinnerBoardScore number board
 
 
 playBingo : List Int -> List Board -> Maybe (Int, Board)
 playBingo numbers boards =
+    findAllWinners numbers boards []
+        |> List.reverse
+        |> List.head
+
+
+findAllWinners : List Int -> List Board -> List (Int, Board) -> List (Int, Board)
+findAllWinners numbers boards winners =
     case numbers of
         [] ->
-            Nothing
+            winners
         x :: xs ->
             let
                 markedBoards =
                     markBoards x boards
-                winnerBoard =
-                    findWinnerBoard markedBoards
+                winnerBoards =
+                    findWinnerBoards markedBoards
+                newWinners =
+                    winnerBoards
+                        |> List.map (\winner -> (x, winner))
+                remainingBoards =
+                    pluckBoards (List.map (\board -> board.id) winnerBoards) markedBoards
             in
-            case winnerBoard of
-                Just board ->
-                    Just (x, board)
-                Nothing ->
-                    playBingo xs markedBoards
+            List.append newWinners winners
+                |> findAllWinners xs remainingBoards
+
+
+pluckBoards : List String -> List Board -> List Board
+pluckBoards ids boards =
+    case ids of
+        [] ->
+            boards
+        x :: xs ->
+            pluckBoard x boards
+                |> pluckBoards xs
+
+
+pluckBoard : String -> List Board -> List Board
+pluckBoard id boards =
+    boards
+        |> List.filter (\board -> board.id /= id)
 
 
 markBoards : Int -> List Board -> List Board
@@ -210,15 +256,14 @@ markBoards number boards =
         markRow =
             \row ->
                 List.map markField row
-        markBoard =
-            \board ->
-                List.map markRow board
+        markBoard board =
+            { board | board = List.map markRow board.board}
     in
     List.map markBoard boards
 
 
 calculateWinnerBoardScore : Int -> Board -> Int
-calculateWinnerBoardScore num board =
+calculateWinnerBoardScore num { board } =
     let
         unmarkedRowSum : Field -> Int -> Int
         unmarkedRowSum =
@@ -235,28 +280,14 @@ calculateWinnerBoardScore num board =
 
 
 
-findWinnerBoard : List Board -> Maybe Board
-findWinnerBoard boards =
-    let
-        step : Board -> Maybe Board -> Maybe Board
-        step =
-            \board acc ->
-                case acc of
-                    Just val ->
-                        Just val
-                    Nothing ->
-                        if hasBoardWon board then
-                            Just board
-                        else
-                            Nothing
-    in
+findWinnerBoards : List Board -> List Board
+findWinnerBoards boards =
     boards
-        |> List.foldl step Nothing
-
+        |> List.filter (\board -> hasBoardWon board)
 
 
 hasBoardWon : Board -> Bool
-hasBoardWon board =
+hasBoardWon { board } =
     let
         rowWon : Field -> Bool -> Bool
         rowWon =

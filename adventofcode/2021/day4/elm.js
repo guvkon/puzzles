@@ -4689,10 +4689,11 @@ var $author$project$Main$parseInput = function (str) {
 			$elm$core$String$words(string));
 	};
 	var parseBoard = function (string) {
-		return A2(
+		var board = A2(
 			$elm$core$List$map,
 			parseRow,
 			$elm$core$String$lines(string));
+		return {board: board, id: string};
 	};
 	var parseBoards = function (strings) {
 		return A2($elm$core$List$map, parseBoard, strings);
@@ -5403,11 +5404,12 @@ var $elm$html$Html$Attributes$rows = function (n) {
 		$elm$core$String$fromInt(n));
 };
 var $author$project$Main$calculateWinnerBoardScore = F2(
-	function (num, board) {
+	function (num, _v0) {
+		var board = _v0.board;
 		var unmarkedRowSum = F2(
-			function (_v0, sum) {
-				var val = _v0.a;
-				var marked = _v0.b;
+			function (_v1, sum) {
+				var val = _v1.a;
+				var marked = _v1.b;
 				return sum + (marked ? 0 : val);
 			});
 		var unmarkedSum = F2(
@@ -5417,6 +5419,9 @@ var $author$project$Main$calculateWinnerBoardScore = F2(
 		var score = A3($elm$core$List$foldl, unmarkedSum, 0, board);
 		return num * score;
 	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -5532,10 +5537,11 @@ var $author$project$Utils$rotateMatrix = function (matrix) {
 		return _List_Nil;
 	}
 };
-var $author$project$Main$hasBoardWon = function (board) {
+var $author$project$Main$hasBoardWon = function (_v0) {
+	var board = _v0.board;
 	var rowWon = F2(
-		function (_v0, won) {
-			var marked = _v0.b;
+		function (_v1, won) {
+			var marked = _v1.b;
 			return won && marked;
 		});
 	var rotatedBoard = $author$project$Utils$rotateMatrix(board);
@@ -5546,17 +5552,13 @@ var $author$project$Main$hasBoardWon = function (board) {
 		});
 	return A3($elm$core$List$foldl, boardWon, false, megaBoard);
 };
-var $author$project$Main$findWinnerBoard = function (boards) {
-	var step = F2(
-		function (board, acc) {
-			if (acc.$ === 'Just') {
-				var val = acc.a;
-				return $elm$core$Maybe$Just(val);
-			} else {
-				return $author$project$Main$hasBoardWon(board) ? $elm$core$Maybe$Just(board) : $elm$core$Maybe$Nothing;
-			}
-		});
-	return A3($elm$core$List$foldl, step, $elm$core$Maybe$Nothing, boards);
+var $author$project$Main$findWinnerBoards = function (boards) {
+	return A2(
+		$elm$core$List$filter,
+		function (board) {
+			return $author$project$Main$hasBoardWon(board);
+		},
+		boards);
 };
 var $author$project$Main$markBoards = F2(
 	function (number, boards) {
@@ -5569,40 +5571,88 @@ var $author$project$Main$markBoards = F2(
 			return A2($elm$core$List$map, markField, row);
 		};
 		var markBoard = function (board) {
-			return A2($elm$core$List$map, markRow, board);
+			return _Utils_update(
+				board,
+				{
+					board: A2($elm$core$List$map, markRow, board.board)
+				});
 		};
 		return A2($elm$core$List$map, markBoard, boards);
 	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$pluckBoard = F2(
+	function (id, boards) {
+		return A2(
+			$elm$core$List$filter,
+			function (board) {
+				return !_Utils_eq(board.id, id);
+			},
+			boards);
+	});
+var $author$project$Main$pluckBoards = F2(
+	function (ids, boards) {
+		if (!ids.b) {
+			return boards;
+		} else {
+			var x = ids.a;
+			var xs = ids.b;
+			return A2(
+				$author$project$Main$pluckBoards,
+				xs,
+				A2($author$project$Main$pluckBoard, x, boards));
+		}
+	});
+var $author$project$Main$findAllWinners = F3(
+	function (numbers, boards, winners) {
+		if (!numbers.b) {
+			return winners;
+		} else {
+			var x = numbers.a;
+			var xs = numbers.b;
+			var markedBoards = A2($author$project$Main$markBoards, x, boards);
+			var winnerBoards = $author$project$Main$findWinnerBoards(markedBoards);
+			var newWinners = A2(
+				$elm$core$List$map,
+				function (winner) {
+					return _Utils_Tuple2(x, winner);
+				},
+				winnerBoards);
+			var remainingBoards = A2(
+				$author$project$Main$pluckBoards,
+				A2(
+					$elm$core$List$map,
+					function (board) {
+						return board.id;
+					},
+					winnerBoards),
+				markedBoards);
+			return A3(
+				$author$project$Main$findAllWinners,
+				xs,
+				remainingBoards,
+				A2($elm$core$List$append, newWinners, winners));
+		}
+	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $author$project$Main$playBingo = F2(
 	function (numbers, boards) {
-		playBingo:
-		while (true) {
-			if (!numbers.b) {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var x = numbers.a;
-				var xs = numbers.b;
-				var markedBoards = A2($author$project$Main$markBoards, x, boards);
-				var winnerBoard = $author$project$Main$findWinnerBoard(markedBoards);
-				if (winnerBoard.$ === 'Just') {
-					var board = winnerBoard.a;
-					return $elm$core$Maybe$Just(
-						_Utils_Tuple2(x, board));
-				} else {
-					var $temp$numbers = xs,
-						$temp$boards = markedBoards;
-					numbers = $temp$numbers;
-					boards = $temp$boards;
-					continue playBingo;
-				}
-			}
-		}
+		return $elm$core$List$head(
+			$elm$core$List$reverse(
+				A3($author$project$Main$findAllWinners, numbers, boards, _List_Nil)));
 	});
 var $author$project$Main$solution1 = function (_v0) {
 	var input = _v0.input;
 	var maybeWinner = A2($author$project$Main$playBingo, input.numbers, input.boards);
 	if (maybeWinner.$ === 'Nothing') {
-		return 0;
+		return -1;
 	} else {
 		var winner = maybeWinner.a;
 		var number = winner.a;
@@ -5610,9 +5660,22 @@ var $author$project$Main$solution1 = function (_v0) {
 		return A2($author$project$Main$calculateWinnerBoardScore, number, board);
 	}
 };
+var $author$project$Main$calculateScore = function (_v0) {
+	var number = _v0.a;
+	var board = _v0.b;
+	return A2($author$project$Main$calculateWinnerBoardScore, number, board);
+};
 var $author$project$Main$solution2 = function (_v0) {
 	var input = _v0.input;
-	return 0;
+	var winners = A3($author$project$Main$findAllWinners, input.numbers, input.boards, _List_Nil);
+	var winnerScores = A2($elm$core$List$map, $author$project$Main$calculateScore, winners);
+	var _v1 = $elm$core$List$head(winnerScores);
+	if (_v1.$ === 'Nothing') {
+		return -1;
+	} else {
+		var score = _v1.a;
+		return score;
+	}
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
