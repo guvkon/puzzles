@@ -110,15 +110,21 @@ parseInput str =
 
 solution1 : Model -> Maybe Int
 solution1 { input } =
-    input
-        |> List.map (String.lines >> getUniqueAnswers >> List.length)
-        |> List.sum
+    solve getUniqueAnswers input
         |> Just
 
 
 solution2 : Model -> Maybe Int
 solution2 { input } =
-    Nothing
+    solve getMatchingAnswers input
+        |> Just
+
+
+solve : (List String -> List Char) -> List String -> Int
+solve func input =
+    input
+        |> List.map (String.lines >> func >> List.length)
+        |> List.sum
 
 
 getUniqueAnswers : List String -> List Char
@@ -131,3 +137,23 @@ getUniqueAnswers answers =
     answers
         |> List.foldl step []
         |> List.Extra.unique
+
+
+getMatchingAnswers : List String -> List Char
+getMatchingAnswers answers =
+    let
+        allAnswers =
+            "abcdefghijklmnopqrstuvwxyz"
+                |> String.toList
+        isAnswerInAll : Char -> Bool
+        isAnswerInAll char =
+            let
+                needle =
+                    String.fromChar char
+            in
+            answers
+                |> List.foldl (\str acc -> acc && String.contains needle str) True
+    in
+    allAnswers
+        |> List.filter isAnswerInAll
+

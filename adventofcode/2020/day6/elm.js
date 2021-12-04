@@ -5300,11 +5300,6 @@ var $elm$html$Html$Attributes$rows = function (n) {
 		'rows',
 		$elm$core$String$fromInt(n));
 };
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -5395,24 +5390,53 @@ var $author$project$Main$getUniqueAnswers = function (answers) {
 	return $elm_community$list_extra$List$Extra$unique(
 		A3($elm$core$List$foldl, step, _List_Nil, answers));
 };
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
 var $elm$core$List$sum = function (numbers) {
 	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
 };
-var $author$project$Main$solution1 = function (_v0) {
-	var input = _v0.C;
-	return $elm$core$Maybe$Just(
-		$elm$core$List$sum(
+var $author$project$Main$solve = F2(
+	function (func, input) {
+		return $elm$core$List$sum(
 			A2(
 				$elm$core$List$map,
 				A2(
 					$elm$core$Basics$composeR,
 					$elm$core$String$lines,
-					A2($elm$core$Basics$composeR, $author$project$Main$getUniqueAnswers, $elm$core$List$length)),
-				input)));
+					A2($elm$core$Basics$composeR, func, $elm$core$List$length)),
+				input));
+	});
+var $author$project$Main$solution1 = function (_v0) {
+	var input = _v0.C;
+	return $elm$core$Maybe$Just(
+		A2($author$project$Main$solve, $author$project$Main$getUniqueAnswers, input));
+};
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $author$project$Main$getMatchingAnswers = function (answers) {
+	var isAnswerInAll = function (_char) {
+		var needle = $elm$core$String$fromChar(_char);
+		return A3(
+			$elm$core$List$foldl,
+			F2(
+				function (str, acc) {
+					return acc && A2($elm$core$String$contains, needle, str);
+				}),
+			true,
+			answers);
+	};
+	var allAnswers = $elm$core$String$toList('abcdefghijklmnopqrstuvwxyz');
+	return A2($elm$core$List$filter, isAnswerInAll, allAnswers);
 };
 var $author$project$Main$solution2 = function (_v0) {
 	var input = _v0.C;
-	return $elm$core$Maybe$Nothing;
+	return $elm$core$Maybe$Just(
+		A2($author$project$Main$solve, $author$project$Main$getMatchingAnswers, input));
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
