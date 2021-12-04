@@ -5422,9 +5422,6 @@ var $author$project$Main$calculateWinnerBoardScore = F2(
 		var score = A3($elm$core$List$foldl, unmarkedSum, 0, board);
 		return num * score;
 	});
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -5655,12 +5652,13 @@ var $author$project$Main$solution1 = function (_v0) {
 	var input = _v0.input;
 	var maybeWinner = A2($author$project$Main$playBingo, input.numbers, input.boards);
 	if (maybeWinner.$ === 'Nothing') {
-		return -1;
+		return $elm$core$Maybe$Nothing;
 	} else {
 		var winner = maybeWinner.a;
 		var number = winner.a;
 		var board = winner.b;
-		return A2($author$project$Main$calculateWinnerBoardScore, number, board);
+		return $elm$core$Maybe$Just(
+			A2($author$project$Main$calculateWinnerBoardScore, number, board));
 	}
 };
 var $author$project$Main$calculateScore = function (_v0) {
@@ -5672,18 +5670,27 @@ var $author$project$Main$solution2 = function (_v0) {
 	var input = _v0.input;
 	var winners = A3($author$project$Main$findAllWinners, input.numbers, input.boards, _List_Nil);
 	var winnerScores = A2($elm$core$List$map, $author$project$Main$calculateScore, winners);
-	var _v1 = $elm$core$List$head(winnerScores);
-	if (_v1.$ === 'Nothing') {
-		return -1;
-	} else {
-		var score = _v1.a;
-		return score;
-	}
+	return $elm$core$List$head(winnerScores);
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$Main$viewModel = function (model) {
+	return 'numbers size = ' + _Utils_ap(
+		$elm$core$String$fromInt(
+			$elm$core$List$length(model.input.numbers)),
+		', boards size = ' + $elm$core$String$fromInt(
+			$elm$core$List$length(model.input.boards)));
+};
+var $author$project$Main$viewSolution = function (solution) {
+	if (solution.$ === 'Just') {
+		var val = solution.a;
+		return $elm$core$String$fromInt(val);
+	} else {
+		return 'NaN';
+	}
+};
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -5708,8 +5715,7 @@ var $author$project$Main$view = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						'Count numbers: ' + $elm$core$String$fromInt(
-							$elm$core$List$length(model.input.numbers)))
+						'Input: ' + $author$project$Main$viewModel(model))
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -5717,16 +5723,7 @@ var $author$project$Main$view = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						'Count boards: ' + $elm$core$String$fromInt(
-							$elm$core$List$length(model.input.boards)))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						'Solution 1: ' + $elm$core$String$fromInt(
+						'Solution 1: ' + $author$project$Main$viewSolution(
 							$author$project$Main$solution1(model)))
 					])),
 				A2(
@@ -5735,7 +5732,7 @@ var $author$project$Main$view = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						'Solution 2: ' + $elm$core$String$fromInt(
+						'Solution 2: ' + $author$project$Main$viewSolution(
 							$author$project$Main$solution2(model)))
 					]))
 			]));

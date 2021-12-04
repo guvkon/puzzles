@@ -60,11 +60,27 @@ view model =
                , cols 40
                , class "bg-secondary text-light border-1 border-dark p-2"
                ] []
-    , div [] [ text ( "Count numbers: " ++ String.fromInt ( List.length model.input.numbers ) ) ]
-    , div [] [ text ( "Count boards: " ++ String.fromInt ( List.length model.input.boards ) ) ]
-    , div [] [ text ( "Solution 1: " ++ String.fromInt ( solution1 model ) ) ]
-    , div [] [ text ( "Solution 2: " ++ String.fromInt ( solution2 model ) ) ]
+    , div [] [ text ( "Input: " ++ viewModel model ) ]
+    , div [] [ text ( "Solution 1: " ++ viewSolution ( solution1 model ) ) ]
+    , div [] [ text ( "Solution 2: " ++ viewSolution ( solution2 model ) ) ]
     ]
+
+
+viewModel : Model -> String
+viewModel model =
+    (++) "numbers size = "
+        <| (++) (String.fromInt (List.length model.input.numbers))
+        <| (++) ", boards size = "
+        <| (String.fromInt (List.length model.input.boards))
+
+
+viewSolution : Maybe Int -> String
+viewSolution solution =
+    case solution of
+        Just val ->
+            String.fromInt val
+        Nothing ->
+            "NaN"
 
 
 -- LOGIC
@@ -143,7 +159,7 @@ parseInput str =
             { numbers = parseNumbers x, boards = parseBoards xs }
 
 
-solution1 : Model -> Int
+solution1 : Model -> Maybe Int
 solution1 { input } =
     let
         maybeWinner =
@@ -151,14 +167,14 @@ solution1 { input } =
     in
     case maybeWinner of
         Nothing ->
-            -1
+            Nothing
         Just winner ->
             case winner of
                 (number, board) ->
-                    calculateWinnerBoardScore number board
+                    Just (calculateWinnerBoardScore number board)
 
 
-solution2 : Model -> Int
+solution2 : Model -> Maybe Int
 solution2 { input } =
     let
         winners =
@@ -166,11 +182,7 @@ solution2 { input } =
         winnerScores =
             List.map calculateScore winners
     in
-    case List.head winnerScores of
-        Nothing ->
-            -1
-        Just score ->
-            score
+    List.head winnerScores
 
 
 calculateScore : (Int, Board) -> Int
