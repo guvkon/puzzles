@@ -4482,11 +4482,6 @@ var $elm$core$Basics$apR = F2(
 	function (x, f) {
 		return f(x);
 	});
-var $elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
 var $elm$core$Basics$add = _Basics_add;
 var $elm$core$List$foldl = F3(
 	function (func, acc, list) {
@@ -4566,17 +4561,6 @@ var $elm$core$List$foldr = F3(
 	function (fn, acc, ls) {
 		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
 	});
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
 		var _v0 = f(mx);
@@ -4595,6 +4579,37 @@ var $elm$core$List$filterMap = F2(
 			_List_Nil,
 			xs);
 	});
+var $elm$core$String$lines = _String_lines;
+var $elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						$elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
 var $elm$core$Basics$eq = _Utils_equal;
 var $elm$core$String$join = F2(
 	function (sep, chunks) {
@@ -4603,7 +4618,7 @@ var $elm$core$String$join = F2(
 			sep,
 			_List_toArray(chunks));
 	});
-var $author$project$Main$groupStrings = F3(
+var $author$project$Utils$groupStrings = F3(
 	function (temp, result, rawList) {
 		groupStrings:
 		while (true) {
@@ -4642,22 +4657,18 @@ var $author$project$Main$groupStrings = F3(
 var $elm$core$String$isEmpty = function (string) {
 	return string === '';
 };
-var $elm$core$String$lines = _String_lines;
-var $elm$core$List$map = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, acc) {
-					return A2(
-						$elm$core$List$cons,
-						f(x),
-						acc);
-				}),
-			_List_Nil,
-			xs);
-	});
 var $elm$core$Basics$not = _Basics_not;
+var $author$project$Utils$parseStringIntoBlocks = function (str) {
+	return $elm$core$List$reverse(
+		A2(
+			$elm$core$List$filter,
+			A2($elm$core$Basics$composeL, $elm$core$Basics$not, $elm$core$String$isEmpty),
+			A3(
+				$author$project$Utils$groupStrings,
+				_List_Nil,
+				_List_Nil,
+				$elm$core$String$lines(str))));
+};
 var $elm$core$String$split = F2(
 	function (sep, string) {
 		return _List_fromArray(
@@ -4698,20 +4709,12 @@ var $author$project$Main$parseInput = function (str) {
 	var parseBoards = function (strings) {
 		return A2($elm$core$List$map, parseBoard, strings);
 	};
-	var groupedStrings = $elm$core$List$reverse(
-		A2(
-			$elm$core$List$filter,
-			A2($elm$core$Basics$composeL, $elm$core$Basics$not, $elm$core$String$isEmpty),
-			A3(
-				$author$project$Main$groupStrings,
-				_List_Nil,
-				_List_Nil,
-				$elm$core$String$lines(str))));
-	if (!groupedStrings.b) {
+	var _v0 = $author$project$Utils$parseStringIntoBlocks(str);
+	if (!_v0.b) {
 		return {boards: _List_Nil, numbers: _List_Nil};
 	} else {
-		var x = groupedStrings.a;
-		var xs = groupedStrings.b;
+		var x = _v0.a;
+		var xs = _v0.b;
 		return {
 			boards: parseBoards(xs),
 			numbers: parseNumbers(x)

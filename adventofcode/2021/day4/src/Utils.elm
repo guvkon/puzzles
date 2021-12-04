@@ -1,4 +1,4 @@
-module Utils exposing (decimal, indexes, element, field, rotateMatrix, letters, stringEntry, exists, count)
+module Utils exposing (decimal, parseStringIntoBlocks, indexes, element, field, rotateMatrix, letters, stringEntry, exists, count)
 
 import Array
 import Binary
@@ -12,6 +12,32 @@ decimal : List Int -> Int
 decimal bits =
     Binary.fromIntegers bits
         |> Binary.toDecimal
+
+
+-- String
+
+
+parseStringIntoBlocks : String -> List String
+parseStringIntoBlocks str =
+    String.lines str
+        |> groupStrings [] []
+        |> List.filter (not << String.isEmpty)
+        |> List.reverse
+
+
+groupStrings : List String -> List String -> List String -> List String
+groupStrings temp result rawList =
+    let
+        append y ys =
+            (String.join "\n" y) :: ys
+    in
+    case rawList of
+        x :: xs ->
+            if x == "" then
+                groupStrings [] (append temp result) xs
+            else
+                groupStrings (x :: temp) result xs
+        [] -> append temp result
 
 
 -- List
