@@ -1,4 +1,4 @@
-module Utils exposing (decimal, parseStringIntoBlocks, indexes, element, field, rotateMatrix, letters, stringEntry, exists, count)
+module Utils exposing (decimal, parseStringIntoBlocks, indexes, element, field, rotateMatrix, counter, letters, stringEntry, exists, count)
 
 import Array
 import Binary
@@ -84,6 +84,11 @@ rotateMatrix matrix =
             indexes x
                 |> List.map step
         [] -> []
+
+
+counter : (a -> Bool) -> a -> Int -> Int
+counter compare val acc =
+    acc + if compare val then 1 else 0
 
 
 -- Bool
