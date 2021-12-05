@@ -140,76 +140,98 @@ parseVector =
 
 solution1 : Model -> Maybe Int
 solution1 { input } =
-    let
-        space =
-            produceSpace input
-        step =
-            Utils.counter (\x -> x >= 2)
-    in
-    space
-        |> applyVectors input
-        |> Matrix.toList
-        |> List.foldl step 0
+    vectorsToCrossings1 input []
+        |> List.Extra.unique
+        |> List.length
         |> Just
 
 
 solution2 : Model -> Maybe Int
 solution2 { input } =
-    Nothing
+    vectorsToCrossings2 input []
+            |> List.Extra.unique
+            |> List.length
+            |> Just
 
 
-produceSpace : List Vector -> Space
-produceSpace vectors =
+vectorsToCrossings1 : List Vector -> List (Int, Int) -> List (Int, Int)
+vectorsToCrossings1 vectors crossings =
+    case vectors of
+        [] ->
+            crossings
+        x :: xs ->
+            vectorsToCrossings1 xs (crossVectorWithVectors1 x xs crossings)
+
+
+crossVectorWithVectors1 : Vector -> List Vector -> List (Int, Int) -> List (Int, Int)
+crossVectorWithVectors1 vector vectors crossings =
+    case vectors of
+        [] ->
+            crossings
+        x :: xs ->
+            crossVectorWithVectors1 vector xs (List.append (crossVectors1 vector x) crossings)
+
+
+crossVectors1 : Vector -> Vector -> List (Int, Int)
+crossVectors1 v1 v2 =
     let
-        xs =
-            vectors
-                |> List.map (\vec -> [vec.x1, vec.x2])
-                |> List.concat
-        ys =
-            vectors
-                |> List.map (\vec -> [vec.y1, vec.y2])
-                |> List.concat
-        width =
-            1 + (Maybe.withDefault -1 (List.maximum xs))
-        height =
-            1 + (Maybe.withDefault -1 (List.maximum ys))
+        coords : Vector -> List (Int, Int)
+        coords { x1, y1, x2, y2 } =
+            if x1 == x2 then
+                List.range (Math.min y1 y2) (Math.max y1 y2)
+                    |> List.map (\y -> (x1, y))
+            else if y1 == y2 then
+                List.range (Math.min x1 x2) (Math.max x1 x2)
+                    |> List.map (\x -> (x, y1))
+            else
+                []
+        coords1 =
+            coords v1
+        coords2 =
+            coords v2
     in
-    Matrix.init width height 0
+    coords1
+        |> List.filterMap (\coord -> if List.member coord coords2 then Just coord else Nothing )
 
 
-applyVectors : List Vector -> Space -> Space
-applyVectors vectors space =
-    vectors
-        |> List.foldl applyVector space
+vectorsToCrossings2 : List Vector -> List (Int, Int) -> List (Int, Int)
+vectorsToCrossings2 vectors crossings =
+    case vectors of
+        [] ->
+            crossings
+        x :: xs ->
+            vectorsToCrossings2 xs (crossVectorWithVectors2 x xs crossings)
 
 
-applyVector : Vector -> Space -> Space
-applyVector { x1, y1, x2, y2 } space =
+crossVectorWithVectors2 : Vector -> List Vector -> List (Int, Int) -> List (Int, Int)
+crossVectorWithVectors2 vector vectors crossings =
+    case vectors of
+        [] ->
+            crossings
+        x :: xs ->
+            crossVectorWithVectors2 vector xs (List.append (crossVectors2 vector x) crossings)
+
+
+crossVectors2 : Vector -> Vector -> List (Int, Int)
+crossVectors2 v1 v2 =
     let
-        step : ((Int, Int), Int) -> Int
-        step (idx, val) =
-            case idx of
-                (x, y) ->
-                    if x1 == x2 then
-                        let
-                            minY = Math.min y1 y2
-                            maxY = Math.max y1 y2
-                        in
-                        if x == x1 && minY <= y && y <= maxY then
-                            val + 1
-                        else
-                            val
-                    else if y1 == y2 then
-                        let
-                            minX = Math.min x1 x2
-                            maxX = Math.max x1 x2
-                        in
-                        if y == y1 && minX <= x && x <= maxX then
-                            val + 1
-                        else
-                            val
-                    else
-                        val
+        coords : Vector -> List (Int, Int)
+        coords { x1, y1, x2, y2 } =
+            if x1 == x2 then
+                List.range (Math.min y1 y2) (Math.max y1 y2)
+                    |> List.map (\y -> (x1, y))
+            else if y1 == y2 then
+                List.range (Math.min x1 x2) (Math.max x1 x2)
+                    |> List.map (\x -> (x, y1))
+            else if Math.abs (x1 - x2) == Math.abs (y1 - y2) then
+                List.Extra.zip (Utils.range x1 x2) (Utils.range y1 y2)
+            else
+                []
+        coords1 =
+            coords v1
+        coords2 =
+            coords v2
     in
-    Matrix.indexedMap step space
+    coords1
+        |> List.filterMap (\coord -> if List.member coord coords2 then Just coord else Nothing )
 

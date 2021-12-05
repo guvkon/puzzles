@@ -5833,102 +5833,73 @@ var $elm$html$Html$Attributes$rows = function (n) {
 		'rows',
 		$elm$core$String$fromInt(n));
 };
-var $elm_community$list_extra$List$Extra$mapAccuml = F3(
-	function (f, acc0, list) {
-		var _v0 = A3(
-			$elm$core$List$foldl,
-			F2(
-				function (x, _v1) {
-					var acc1 = _v1.a;
-					var ys = _v1.b;
-					var _v2 = A2(f, acc1, x);
-					var acc2 = _v2.a;
-					var y = _v2.b;
-					return _Utils_Tuple2(
-						acc2,
-						A2($elm$core$List$cons, y, ys));
-				}),
-			_Utils_Tuple2(acc0, _List_Nil),
-			list);
-		var accFinal = _v0.a;
-		var generatedList = _v0.b;
-		return _Utils_Tuple2(
-			accFinal,
-			$elm$core$List$reverse(generatedList));
-	});
-var $author$project$Matrix$indexedMap = F2(
-	function (func, matrix) {
-		var step = F2(
-			function (idx, val) {
-				return func(
-					_Utils_Tuple2(idx, val));
-			});
-		var nextIndex = function (idx) {
-			var xx = idx.a;
-			var yy = idx.b;
-			return _Utils_eq(yy, matrix.width - 1) ? _Utils_Tuple2(xx + 1, 0) : _Utils_Tuple2(xx, yy + 1);
-		};
-		var indexesStep = F2(
-			function (acc, _v1) {
-				return _Utils_Tuple2(
-					nextIndex(acc),
-					nextIndex(acc));
-			});
-		var indexes = function () {
-			var _v0 = A3(
-				$elm_community$list_extra$List$Extra$mapAccuml,
-				indexesStep,
-				_Utils_Tuple2(0, -1),
-				matrix.values);
-			var list = _v0.b;
-			return list;
-		}();
-		return _Utils_update(
-			matrix,
-			{
-				values: A3($elm$core$List$map2, step, indexes, matrix.values)
-			});
-	});
-var $elm$core$Basics$min = F2(
-	function (x, y) {
-		return (_Utils_cmp(x, y) < 0) ? x : y;
-	});
-var $author$project$Main$applyVector = F2(
-	function (_v0, space) {
-		var x1 = _v0.x1;
-		var y1 = _v0.y1;
-		var x2 = _v0.x2;
-		var y2 = _v0.y2;
-		var step = function (_v2) {
-			var idx = _v2.a;
-			var val = _v2.b;
-			var x = idx.a;
-			var y = idx.b;
-			if (_Utils_eq(x1, x2)) {
-				var minY = A2($elm$core$Basics$min, y1, y2);
-				var maxY = A2($elm$core$Basics$max, y1, y2);
-				return (_Utils_eq(x, x1) && ((_Utils_cmp(minY, y) < 1) && (_Utils_cmp(y, maxY) < 1))) ? (val + 1) : val;
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
 			} else {
-				if (_Utils_eq(y1, y2)) {
-					var minX = A2($elm$core$Basics$min, x1, x2);
-					var maxX = A2($elm$core$Basics$max, x1, x2);
-					return (_Utils_eq(y, y1) && ((_Utils_cmp(minX, x) < 1) && (_Utils_cmp(x, maxX) < 1))) ? (val + 1) : val;
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
 				} else {
-					return val;
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
 				}
 			}
-		};
-		return A2($author$project$Matrix$indexedMap, step, space);
+		}
 	});
-var $author$project$Main$applyVectors = F2(
-	function (vectors, space) {
-		return A3($elm$core$List$foldl, $author$project$Main$applyVector, space, vectors);
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
 	});
-var $author$project$Utils$counter = F3(
-	function (compare, val, acc) {
-		return acc + (compare(val) ? 1 : 0);
+var $elm_community$list_extra$List$Extra$uniqueHelp = F4(
+	function (f, existing, remaining, accumulator) {
+		uniqueHelp:
+		while (true) {
+			if (!remaining.b) {
+				return $elm$core$List$reverse(accumulator);
+			} else {
+				var first = remaining.a;
+				var rest = remaining.b;
+				var computedFirst = f(first);
+				if (A2($elm$core$List$member, computedFirst, existing)) {
+					var $temp$f = f,
+						$temp$existing = existing,
+						$temp$remaining = rest,
+						$temp$accumulator = accumulator;
+					f = $temp$f;
+					existing = $temp$existing;
+					remaining = $temp$remaining;
+					accumulator = $temp$accumulator;
+					continue uniqueHelp;
+				} else {
+					var $temp$f = f,
+						$temp$existing = A2($elm$core$List$cons, computedFirst, existing),
+						$temp$remaining = rest,
+						$temp$accumulator = A2($elm$core$List$cons, first, accumulator);
+					f = $temp$f;
+					existing = $temp$existing;
+					remaining = $temp$remaining;
+					accumulator = $temp$accumulator;
+					continue uniqueHelp;
+				}
+			}
+		}
 	});
-var $elm$core$Basics$ge = _Utils_ge;
+var $elm_community$list_extra$List$Extra$unique = function (list) {
+	return A4($elm_community$list_extra$List$Extra$uniqueHelp, $elm$core$Basics$identity, _List_Nil, list, _List_Nil);
+};
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -5937,105 +5908,190 @@ var $elm$core$List$append = F2(
 			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
 		}
 	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $elm$core$List$repeatHelp = F3(
-	function (result, n, value) {
-		repeatHelp:
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $author$project$Main$crossVectors1 = F2(
+	function (v1, v2) {
+		var coords = function (_v0) {
+			var x1 = _v0.x1;
+			var y1 = _v0.y1;
+			var x2 = _v0.x2;
+			var y2 = _v0.y2;
+			return _Utils_eq(x1, x2) ? A2(
+				$elm$core$List$map,
+				function (y) {
+					return _Utils_Tuple2(x1, y);
+				},
+				A2(
+					$elm$core$List$range,
+					A2($elm$core$Basics$min, y1, y2),
+					A2($elm$core$Basics$max, y1, y2))) : (_Utils_eq(y1, y2) ? A2(
+				$elm$core$List$map,
+				function (x) {
+					return _Utils_Tuple2(x, y1);
+				},
+				A2(
+					$elm$core$List$range,
+					A2($elm$core$Basics$min, x1, x2),
+					A2($elm$core$Basics$max, x1, x2))) : _List_Nil);
+		};
+		var coords1 = coords(v1);
+		var coords2 = coords(v2);
+		return A2(
+			$elm$core$List$filterMap,
+			function (coord) {
+				return A2($elm$core$List$member, coord, coords2) ? $elm$core$Maybe$Just(coord) : $elm$core$Maybe$Nothing;
+			},
+			coords1);
+	});
+var $author$project$Main$crossVectorWithVectors1 = F3(
+	function (vector, vectors, crossings) {
+		crossVectorWithVectors1:
 		while (true) {
-			if (n <= 0) {
-				return result;
+			if (!vectors.b) {
+				return crossings;
 			} else {
-				var $temp$result = A2($elm$core$List$cons, value, result),
-					$temp$n = n - 1,
-					$temp$value = value;
-				result = $temp$result;
-				n = $temp$n;
-				value = $temp$value;
-				continue repeatHelp;
+				var x = vectors.a;
+				var xs = vectors.b;
+				var $temp$vector = vector,
+					$temp$vectors = xs,
+					$temp$crossings = A2(
+					$elm$core$List$append,
+					A2($author$project$Main$crossVectors1, vector, x),
+					crossings);
+				vector = $temp$vector;
+				vectors = $temp$vectors;
+				crossings = $temp$crossings;
+				continue crossVectorWithVectors1;
 			}
 		}
 	});
-var $elm$core$List$repeat = F2(
-	function (n, value) {
-		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
-	});
-var $author$project$Matrix$init = F3(
-	function (w, h, value) {
-		return {
-			height: h,
-			values: A2($elm$core$List$repeat, w * h, value),
-			width: w
-		};
-	});
-var $elm$core$List$maximum = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(
-			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
+var $author$project$Main$vectorsToCrossings1 = F2(
+	function (vectors, crossings) {
+		vectorsToCrossings1:
+		while (true) {
+			if (!vectors.b) {
+				return crossings;
+			} else {
+				var x = vectors.a;
+				var xs = vectors.b;
+				var $temp$vectors = xs,
+					$temp$crossings = A3($author$project$Main$crossVectorWithVectors1, x, xs, crossings);
+				vectors = $temp$vectors;
+				crossings = $temp$crossings;
+				continue vectorsToCrossings1;
+			}
 		}
 	});
-var $author$project$Main$produceSpace = function (vectors) {
-	var ys = $elm$core$List$concat(
-		A2(
-			$elm$core$List$map,
-			function (vec) {
-				return _List_fromArray(
-					[vec.y1, vec.y2]);
-			},
-			vectors));
-	var xs = $elm$core$List$concat(
-		A2(
-			$elm$core$List$map,
-			function (vec) {
-				return _List_fromArray(
-					[vec.x1, vec.x2]);
-			},
-			vectors));
-	var width = 1 + A2(
-		$elm$core$Maybe$withDefault,
-		-1,
-		$elm$core$List$maximum(xs));
-	var height = 1 + A2(
-		$elm$core$Maybe$withDefault,
-		-1,
-		$elm$core$List$maximum(ys));
-	return A3($author$project$Matrix$init, width, height, 0);
-};
-var $author$project$Matrix$toList = function (matrix) {
-	return matrix.values;
-};
 var $author$project$Main$solution1 = function (_v0) {
 	var input = _v0.input;
-	var step = $author$project$Utils$counter(
-		function (x) {
-			return x >= 2;
-		});
-	var space = $author$project$Main$produceSpace(input);
 	return $elm$core$Maybe$Just(
-		A3(
-			$elm$core$List$foldl,
-			step,
-			0,
-			$author$project$Matrix$toList(
-				A2($author$project$Main$applyVectors, input, space))));
+		$elm$core$List$length(
+			$elm_community$list_extra$List$Extra$unique(
+				A2($author$project$Main$vectorsToCrossings1, input, _List_Nil))));
 };
+var $elm$core$Basics$abs = function (n) {
+	return (n < 0) ? (-n) : n;
+};
+var $author$project$Utils$range = F2(
+	function (left, right) {
+		var list = A2(
+			$elm$core$List$range,
+			A2($elm$core$Basics$min, left, right),
+			A2($elm$core$Basics$max, left, right));
+		return (_Utils_cmp(left, right) < 0) ? list : $elm$core$List$reverse(list);
+	});
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $elm_community$list_extra$List$Extra$zip = $elm$core$List$map2($elm$core$Tuple$pair);
+var $author$project$Main$crossVectors2 = F2(
+	function (v1, v2) {
+		var coords = function (_v0) {
+			var x1 = _v0.x1;
+			var y1 = _v0.y1;
+			var x2 = _v0.x2;
+			var y2 = _v0.y2;
+			return _Utils_eq(x1, x2) ? A2(
+				$elm$core$List$map,
+				function (y) {
+					return _Utils_Tuple2(x1, y);
+				},
+				A2(
+					$elm$core$List$range,
+					A2($elm$core$Basics$min, y1, y2),
+					A2($elm$core$Basics$max, y1, y2))) : (_Utils_eq(y1, y2) ? A2(
+				$elm$core$List$map,
+				function (x) {
+					return _Utils_Tuple2(x, y1);
+				},
+				A2(
+					$elm$core$List$range,
+					A2($elm$core$Basics$min, x1, x2),
+					A2($elm$core$Basics$max, x1, x2))) : (_Utils_eq(
+				$elm$core$Basics$abs(x1 - x2),
+				$elm$core$Basics$abs(y1 - y2)) ? A2(
+				$elm_community$list_extra$List$Extra$zip,
+				A2($author$project$Utils$range, x1, x2),
+				A2($author$project$Utils$range, y1, y2)) : _List_Nil));
+		};
+		var coords1 = coords(v1);
+		var coords2 = coords(v2);
+		return A2(
+			$elm$core$List$filterMap,
+			function (coord) {
+				return A2($elm$core$List$member, coord, coords2) ? $elm$core$Maybe$Just(coord) : $elm$core$Maybe$Nothing;
+			},
+			coords1);
+	});
+var $author$project$Main$crossVectorWithVectors2 = F3(
+	function (vector, vectors, crossings) {
+		crossVectorWithVectors2:
+		while (true) {
+			if (!vectors.b) {
+				return crossings;
+			} else {
+				var x = vectors.a;
+				var xs = vectors.b;
+				var $temp$vector = vector,
+					$temp$vectors = xs,
+					$temp$crossings = A2(
+					$elm$core$List$append,
+					A2($author$project$Main$crossVectors2, vector, x),
+					crossings);
+				vector = $temp$vector;
+				vectors = $temp$vectors;
+				crossings = $temp$crossings;
+				continue crossVectorWithVectors2;
+			}
+		}
+	});
+var $author$project$Main$vectorsToCrossings2 = F2(
+	function (vectors, crossings) {
+		vectorsToCrossings2:
+		while (true) {
+			if (!vectors.b) {
+				return crossings;
+			} else {
+				var x = vectors.a;
+				var xs = vectors.b;
+				var $temp$vectors = xs,
+					$temp$crossings = A3($author$project$Main$crossVectorWithVectors2, x, xs, crossings);
+				vectors = $temp$vectors;
+				crossings = $temp$crossings;
+				continue vectorsToCrossings2;
+			}
+		}
+	});
 var $author$project$Main$solution2 = function (_v0) {
 	var input = _v0.input;
-	return $elm$core$Maybe$Nothing;
+	return $elm$core$Maybe$Just(
+		$elm$core$List$length(
+			$elm_community$list_extra$List$Extra$unique(
+				A2($author$project$Main$vectorsToCrossings2, input, _List_Nil))));
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;

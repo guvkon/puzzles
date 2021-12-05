@@ -1,6 +1,7 @@
-module Utils exposing (decimal, parseStringIntoBlocks, indexes, element, field, rotateMatrix, counter, letters, stringEntry, exists, count)
+module Utils exposing (decimal, parseStringIntoBlocks, indexes, element, field, rotateMatrix, counter, range, letters, stringEntry, exists, count)
 
 import Array
+import Basics as Math
 import Binary
 import Parser exposing ((|.), Parser, chompIf, chompWhile, getChompedString, succeed)
 
@@ -89,6 +90,18 @@ rotateMatrix matrix =
 counter : (a -> Bool) -> a -> Int -> Int
 counter compare val acc =
     acc + if compare val then 1 else 0
+
+
+range : Int -> Int -> List Int
+range left right =
+    let
+        list =
+            List.range (Math.min left right) (Math.max left right)
+    in
+    if left < right then
+        list
+    else
+        List.reverse list
 
 
 -- Bool
