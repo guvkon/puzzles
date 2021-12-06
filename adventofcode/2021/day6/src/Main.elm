@@ -88,6 +88,18 @@ viewSolution solution =
 -- LOGIC
 
 
+type alias Cluster = { f0 : Int
+                     , f1 : Int
+                     , f2 : Int
+                     , f3 : Int
+                     , f4 : Int
+                     , f5 : Int
+                     , f6 : Int
+                     , f7 : Int
+                     , f8 : Int
+                     }
+
+
 defaultContent =
     """3,4,3,1,2"""
 
@@ -100,16 +112,7 @@ parseInput str =
 
 solution1 : Model -> Maybe Int
 solution1 { input } =
-    let
-        step : a -> List Int -> List Int
-        step _ acc =
-            List.map nextDay acc
-                |> List.concat
-    in
-    List.range 0 79
-        |> List.foldl step input
-        |> List.length
-        |> Just
+    solve 80 input
 
 
 solution2 : Model -> Maybe Int
@@ -117,10 +120,68 @@ solution2 { input } =
     Nothing
 
 
-nextDay : Int -> List Int
-nextDay num =
-    case num of
-        0 ->
-            [6, 8]
-        x ->
-            [x - 1]
+solve : Int -> List Int -> Maybe Int
+solve days fish =
+    let
+        countCluster cluster =
+            case cluster of
+                { f0, f1, f2, f3, f4, f5, f6, f7, f8 } ->
+                    f0 + f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8
+    in
+    List.range 0 (days - 1)
+        |> List.foldl (\_ cl -> nextDay cl) (clusterise fish)
+        |> countCluster
+        |> Just
+
+
+nextDay : Cluster -> Cluster
+nextDay cluster =
+    case cluster of
+        { f0, f1, f2, f3, f4, f5, f6, f7, f8 } ->
+            { f0 = f1
+            , f1 = f2
+            , f2 = f3
+            , f3 = f4
+            , f4 = f5
+            , f5 = f6
+            , f6 = f7 + f0
+            , f7 = f8
+            , f8 = f0
+            }
+
+
+clusterise : List Int -> Cluster
+clusterise fish =
+    let
+        zeroCluster =
+            { f0 = 0
+            , f1 = 0
+            , f2 = 0
+            , f3 = 0
+            , f4 = 0
+            , f5 = 0
+            , f6 = 0
+            , f7 = 0
+            , f8 = 0
+            }
+    in
+    fish
+        |> List.foldl (\f cluster -> addFishToCluster f cluster) zeroCluster
+
+
+addFishToCluster : Int -> Cluster -> Cluster
+addFishToCluster fish cluster =
+    case cluster of
+        { f0, f1, f2, f3, f4, f5, f6, f7, f8 } ->
+            { cluster
+            | f0 = f0 + if fish == 0 then 1 else 0
+            , f1 = f1 + if fish == 1 then 1 else 0
+            , f2 = f2 + if fish == 2 then 1 else 0
+            , f3 = f3 + if fish == 3 then 1 else 0
+            , f4 = f4 + if fish == 4 then 1 else 0
+            , f5 = f5 + if fish == 5 then 1 else 0
+            , f6 = f6 + if fish == 6 then 1 else 0
+            , f7 = f7 + if fish == 7 then 1 else 0
+            , f8 = f8 + if fish == 8 then 1 else 0
+            }
+

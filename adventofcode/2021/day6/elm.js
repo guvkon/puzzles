@@ -5264,41 +5264,82 @@ var $elm$html$Html$Attributes$rows = function (n) {
 		'rows',
 		$elm$core$String$fromInt(n));
 };
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
+var $author$project$Main$addFishToCluster = F2(
+	function (fish, cluster) {
+		var f0 = cluster.f0;
+		var f1 = cluster.f1;
+		var f2 = cluster.f2;
+		var f3 = cluster.f3;
+		var f4 = cluster.f4;
+		var f5 = cluster.f5;
+		var f6 = cluster.f6;
+		var f7 = cluster.f7;
+		var f8 = cluster.f8;
+		return _Utils_update(
+			cluster,
+			{
+				f0: f0 + ((!fish) ? 1 : 0),
+				f1: f1 + ((fish === 1) ? 1 : 0),
+				f2: f2 + ((fish === 2) ? 1 : 0),
+				f3: f3 + ((fish === 3) ? 1 : 0),
+				f4: f4 + ((fish === 4) ? 1 : 0),
+				f5: f5 + ((fish === 5) ? 1 : 0),
+				f6: f6 + ((fish === 6) ? 1 : 0),
+				f7: f7 + ((fish === 7) ? 1 : 0),
+				f8: f8 + ((fish === 8) ? 1 : 0)
+			});
 	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+var $author$project$Main$clusterise = function (fish) {
+	var zeroCluster = {f0: 0, f1: 0, f2: 0, f3: 0, f4: 0, f5: 0, f6: 0, f7: 0, f8: 0};
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (f, cluster) {
+				return A2($author$project$Main$addFishToCluster, f, cluster);
+			}),
+		zeroCluster,
+		fish);
 };
-var $author$project$Main$nextDay = function (num) {
-	if (!num) {
-		return _List_fromArray(
-			[6, 8]);
-	} else {
-		var x = num;
-		return _List_fromArray(
-			[x - 1]);
-	}
+var $author$project$Main$nextDay = function (cluster) {
+	var f0 = cluster.f0;
+	var f1 = cluster.f1;
+	var f2 = cluster.f2;
+	var f3 = cluster.f3;
+	var f4 = cluster.f4;
+	var f5 = cluster.f5;
+	var f6 = cluster.f6;
+	var f7 = cluster.f7;
+	var f8 = cluster.f8;
+	return {f0: f1, f1: f2, f2: f3, f3: f4, f4: f5, f5: f6, f6: f7 + f0, f7: f8, f8: f0};
 };
+var $author$project$Main$solve = F2(
+	function (days, fish) {
+		var countCluster = function (cluster) {
+			var f0 = cluster.f0;
+			var f1 = cluster.f1;
+			var f2 = cluster.f2;
+			var f3 = cluster.f3;
+			var f4 = cluster.f4;
+			var f5 = cluster.f5;
+			var f6 = cluster.f6;
+			var f7 = cluster.f7;
+			var f8 = cluster.f8;
+			return (((((((f0 + f1) + f2) + f3) + f4) + f5) + f6) + f7) + f8;
+		};
+		return $elm$core$Maybe$Just(
+			countCluster(
+				A3(
+					$elm$core$List$foldl,
+					F2(
+						function (_v0, cl) {
+							return $author$project$Main$nextDay(cl);
+						}),
+					$author$project$Main$clusterise(fish),
+					A2($elm$core$List$range, 0, days - 1))));
+	});
 var $author$project$Main$solution1 = function (_v0) {
 	var input = _v0.input;
-	var step = F2(
-		function (_v1, acc) {
-			return $elm$core$List$concat(
-				A2($elm$core$List$map, $author$project$Main$nextDay, acc));
-		});
-	return $elm$core$Maybe$Just(
-		$elm$core$List$length(
-			A3(
-				$elm$core$List$foldl,
-				step,
-				input,
-				A2($elm$core$List$range, 0, 79))));
+	return A2($author$project$Main$solve, 80, input);
 };
 var $author$project$Main$solution2 = function (_v0) {
 	var input = _v0.input;
