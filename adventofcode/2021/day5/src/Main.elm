@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Basics as Math
 import Browser
+import Dict exposing (Dict)
 import Html exposing (Html, Attribute, div, textarea, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
@@ -95,7 +96,7 @@ type alias Vector = { x1 : Int
                     }
 
 
-type alias Space = Matrix.Matrix Int
+type alias Space = Dict String Int
 
 
 defaultContent =
@@ -140,98 +141,77 @@ parseVector =
 
 solution1 : Model -> Maybe Int
 solution1 { input } =
-    vectorsToCrossings1 input []
-        |> List.Extra.unique
-        |> List.length
+    let
+        drawVector vector space =
+            vectorToCoordinates1 vector
+                |> List.foldl addCoordinatesToSpace space
+    in
+    input
+        |> List.foldl drawVector Dict.empty
+        |> calculateSpace
         |> Just
 
 
 solution2 : Model -> Maybe Int
 solution2 { input } =
-    vectorsToCrossings2 input []
-            |> List.Extra.unique
-            |> List.length
-            |> Just
-
-
-vectorsToCrossings1 : List Vector -> List (Int, Int) -> List (Int, Int)
-vectorsToCrossings1 vectors crossings =
-    case vectors of
-        [] ->
-            crossings
-        x :: xs ->
-            vectorsToCrossings1 xs (crossVectorWithVectors1 x xs crossings)
-
-
-crossVectorWithVectors1 : Vector -> List Vector -> List (Int, Int) -> List (Int, Int)
-crossVectorWithVectors1 vector vectors crossings =
-    case vectors of
-        [] ->
-            crossings
-        x :: xs ->
-            crossVectorWithVectors1 vector xs (List.append (crossVectors1 vector x) crossings)
-
-
-crossVectors1 : Vector -> Vector -> List (Int, Int)
-crossVectors1 v1 v2 =
     let
-        coords : Vector -> List (Int, Int)
-        coords { x1, y1, x2, y2 } =
-            if x1 == x2 then
-                List.range (Math.min y1 y2) (Math.max y1 y2)
-                    |> List.map (\y -> (x1, y))
-            else if y1 == y2 then
-                List.range (Math.min x1 x2) (Math.max x1 x2)
-                    |> List.map (\x -> (x, y1))
-            else
-                []
-        coords1 =
-            coords v1
-        coords2 =
-            coords v2
+        drawVector vector space =
+            vectorToCoordinates2 vector
+                |> List.foldl addCoordinatesToSpace space
     in
-    coords1
-        |> List.filterMap (\coord -> if List.member coord coords2 then Just coord else Nothing )
+    input
+        |> List.foldl drawVector Dict.empty
+        |> calculateSpace
+        |> Just
 
 
-vectorsToCrossings2 : List Vector -> List (Int, Int) -> List (Int, Int)
-vectorsToCrossings2 vectors crossings =
-    case vectors of
-        [] ->
-            crossings
-        x :: xs ->
-            vectorsToCrossings2 xs (crossVectorWithVectors2 x xs crossings)
+calculateSpace : Space -> Int
+calculateSpace space =
+    space
+        |> Dict.foldl (\_ v sum -> sum + if v > 1 then 1 else 0) 0
 
 
-crossVectorWithVectors2 : Vector -> List Vector -> List (Int, Int) -> List (Int, Int)
-crossVectorWithVectors2 vector vectors crossings =
-    case vectors of
-        [] ->
-            crossings
-        x :: xs ->
-            crossVectorWithVectors2 vector xs (List.append (crossVectors2 vector x) crossings)
+vectorToCoordinates1 : Vector -> List (Int, Int)
+vectorToCoordinates1 { x1, y1, x2, y2 } =
+    if x1 == x2 then
+        List.range (Math.min y1 y2) (Math.max y1 y2)
+            |> List.map (\y -> (x1, y))
+    else if y1 == y2 then
+        List.range (Math.min x1 x2) (Math.max x1 x2)
+            |> List.map (\x -> (x, y1))
+    else
+        []
 
 
-crossVectors2 : Vector -> Vector -> List (Int, Int)
-crossVectors2 v1 v2 =
+vectorToCoordinates2 : Vector -> List (Int, Int)
+vectorToCoordinates2 { x1, y1, x2, y2 } =
+    if x1 == x2 then
+        List.range (Math.min y1 y2) (Math.max y1 y2)
+            |> List.map (\y -> (x1, y))
+    else if y1 == y2 then
+        List.range (Math.min x1 x2) (Math.max x1 x2)
+            |> List.map (\x -> (x, y1))
+    else if Math.abs (x1 - x2) == Math.abs (y1 - y2) then
+        List.Extra.zip (Utils.range x1 x2) (Utils.range y1 y2)
+    else
+        []
+
+
+addCoordinatesToSpace : (Int, Int) -> Space -> Space
+addCoordinatesToSpace coord space =
     let
-        coords : Vector -> List (Int, Int)
-        coords { x1, y1, x2, y2 } =
-            if x1 == x2 then
-                List.range (Math.min y1 y2) (Math.max y1 y2)
-                    |> List.map (\y -> (x1, y))
-            else if y1 == y2 then
-                List.range (Math.min x1 x2) (Math.max x1 x2)
-                    |> List.map (\x -> (x, y1))
-            else if Math.abs (x1 - x2) == Math.abs (y1 - y2) then
-                List.Extra.zip (Utils.range x1 x2) (Utils.range y1 y2)
-            else
-                []
-        coords1 =
-            coords v1
-        coords2 =
-            coords v2
+        set : Maybe Int -> Maybe Int
+        set value =
+            case value of
+                Just val ->
+                    Just (val + 1)
+                Nothing ->
+                    Just 1
     in
-    coords1
-        |> List.filterMap (\coord -> if List.member coord coords2 then Just coord else Nothing )
+    Dict.update (coordToSpaceKey coord) set space
+
+
+coordToSpaceKey : (Int, Int) -> String
+coordToSpaceKey (x, y) =
+    String.fromInt x ++ "-" ++ String.fromInt y
 
