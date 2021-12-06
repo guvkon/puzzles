@@ -94,15 +94,33 @@ defaultContent =
 
 parseInput : String -> List Int
 parseInput str =
-    []
+    String.split "," str
+        |> List.filterMap String.toInt
 
 
 solution1 : Model -> Maybe Int
 solution1 { input } =
-    Nothing
+    let
+        step : a -> List Int -> List Int
+        step _ acc =
+            List.map nextDay acc
+                |> List.concat
+    in
+    List.range 0 79
+        |> List.foldl step input
+        |> List.length
+        |> Just
 
 
 solution2 : Model -> Maybe Int
 solution2 { input } =
     Nothing
 
+
+nextDay : Int -> List Int
+nextDay num =
+    case num of
+        0 ->
+            [6, 8]
+        x ->
+            [x - 1]
