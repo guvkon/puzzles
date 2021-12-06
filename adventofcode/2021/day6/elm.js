@@ -5343,7 +5343,7 @@ var $author$project$Main$solution1 = function (_v0) {
 };
 var $author$project$Main$solution2 = function (_v0) {
 	var input = _v0.input;
-	return $elm$core$Maybe$Nothing;
+	return A2($author$project$Main$solve, 256, input);
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;

@@ -117,7 +117,7 @@ solution1 { input } =
 
 solution2 : Model -> Maybe Int
 solution2 { input } =
-    Nothing
+    solve 256 input
 
 
 solve : Int -> List Int -> Maybe Int
