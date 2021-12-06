@@ -173,8 +173,7 @@ addFishToCluster : Int -> Cluster -> Cluster
 addFishToCluster fish cluster =
     case cluster of
         { f0, f1, f2, f3, f4, f5, f6, f7, f8 } ->
-            { cluster
-            | f0 = f0 + if fish == 0 then 1 else 0
+            { f0 = f0 + if fish == 0 then 1 else 0
             , f1 = f1 + if fish == 1 then 1 else 0
             , f2 = f2 + if fish == 2 then 1 else 0
             , f3 = f3 + if fish == 3 then 1 else 0

@@ -5275,19 +5275,17 @@ var $author$project$Main$addFishToCluster = F2(
 		var f6 = cluster.f6;
 		var f7 = cluster.f7;
 		var f8 = cluster.f8;
-		return _Utils_update(
-			cluster,
-			{
-				f0: f0 + ((!fish) ? 1 : 0),
-				f1: f1 + ((fish === 1) ? 1 : 0),
-				f2: f2 + ((fish === 2) ? 1 : 0),
-				f3: f3 + ((fish === 3) ? 1 : 0),
-				f4: f4 + ((fish === 4) ? 1 : 0),
-				f5: f5 + ((fish === 5) ? 1 : 0),
-				f6: f6 + ((fish === 6) ? 1 : 0),
-				f7: f7 + ((fish === 7) ? 1 : 0),
-				f8: f8 + ((fish === 8) ? 1 : 0)
-			});
+		return {
+			f0: f0 + ((!fish) ? 1 : 0),
+			f1: f1 + ((fish === 1) ? 1 : 0),
+			f2: f2 + ((fish === 2) ? 1 : 0),
+			f3: f3 + ((fish === 3) ? 1 : 0),
+			f4: f4 + ((fish === 4) ? 1 : 0),
+			f5: f5 + ((fish === 5) ? 1 : 0),
+			f6: f6 + ((fish === 6) ? 1 : 0),
+			f7: f7 + ((fish === 7) ? 1 : 0),
+			f8: f8 + ((fish === 8) ? 1 : 0)
+		};
 	});
 var $author$project$Main$clusterise = function (fish) {
 	var zeroCluster = {f0: 0, f1: 0, f2: 0, f3: 0, f4: 0, f5: 0, f6: 0, f7: 0, f8: 0};
