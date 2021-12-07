@@ -2,8 +2,8 @@ module Main exposing (..)
 
 import Basics
 import Browser
-import Html exposing (Html, Attribute, div, textarea, text)
-import Html.Attributes exposing (placeholder, value, cols, rows, class)
+import Html exposing (Html, Attribute, div, a, textarea, text)
+import Html.Attributes exposing (class, cols, href, placeholder, rows, target, value)
 import Html.Events exposing (onInput)
 import Matrix
 import Parser exposing ((|.), (|=), Parser, int, spaces, succeed, symbol)
@@ -64,11 +64,15 @@ view model =
                , cols 40
                , class "bg-dark text-white-50 border-1 border-secondary p-2"
                ] []
+    , div [] [ a [ href (linkToInput 2021 7)
+             , target "_blank"
+             , class "text-white-50"
+             ] [ text "Link to puzzle's input" ] ]
     , div [] [ text ( "Input: " ++ viewModel model ) ]
     , div [] [ text ( "Solution 1: " ++ viewSolution ( solution1 model ) ) ]
     , div [] [ text ( "Test 1: " ++ testSolution 37 ( solution1 model ) ) ]
     , div [] [ text ( "Solution 2: " ++ viewSolution ( solution2 model ) ) ]
-    , div [] [ text ( "Solution 2: " ++ testSolution 168 ( solution2 model ) ) ]
+    , div [] [ text ( "Test 2: " ++ testSolution 168 ( solution2 model ) ) ]
     ]
 
 
@@ -97,6 +101,15 @@ testSolution target result =
                 "Passing"
             else
                 "Error"
+
+
+linkToInput : Int -> Int -> String
+linkToInput year day =
+    "https://adventofcode.com/"
+        ++ (String.fromInt year)
+        ++ "/day/"
+        ++ (String.fromInt day)
+        ++ "/input"
 
 
 

@@ -5211,6 +5211,7 @@ var $author$project$Main$update = F2(
 var $author$project$Main$Change = function (a) {
 	return {$: 'Change', a: a};
 };
+var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -5227,6 +5228,16 @@ var $elm$html$Html$Attributes$cols = function (n) {
 		$elm$core$String$fromInt(n));
 };
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
+var $author$project$Main$linkToInput = F2(
+	function (year, day) {
+		return 'https://adventofcode.com/' + ($elm$core$String$fromInt(year) + ('/day/' + ($elm$core$String$fromInt(day) + '/input')));
+	});
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -5370,6 +5381,7 @@ var $author$project$Main$solution2 = function (_v0) {
 	var input = _v0.input;
 	return A2($author$project$Main$solve, $author$project$Main$calculateFuel2, input);
 };
+var $elm$html$Html$Attributes$target = $elm$html$Html$Attributes$stringProperty('target');
 var $author$project$Main$testSolution = F2(
 	function (target, result) {
 		if (result.$ === 'Nothing') {
@@ -5418,6 +5430,25 @@ var $author$project$Main$view = function (model) {
 				_List_Nil,
 				_List_fromArray(
 					[
+						A2(
+						$elm$html$Html$a,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$href(
+								A2($author$project$Main$linkToInput, 2021, 7)),
+								$elm$html$Html$Attributes$target('_blank'),
+								$elm$html$Html$Attributes$class('text-white-50')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Link to puzzle\'s input')
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
 						$elm$html$Html$text(
 						'Input: ' + $author$project$Main$viewModel(model))
 					])),
@@ -5456,7 +5487,7 @@ var $author$project$Main$view = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						'Solution 2: ' + A2(
+						'Test 2: ' + A2(
 							$author$project$Main$testSolution,
 							168,
 							$author$project$Main$solution2(model)))
