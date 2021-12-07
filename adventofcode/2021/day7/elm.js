@@ -5370,6 +5370,15 @@ var $author$project$Main$solution2 = function (_v0) {
 	var input = _v0.input;
 	return A2($author$project$Main$solve, $author$project$Main$calculateFuel2, input);
 };
+var $author$project$Main$testSolution = F2(
+	function (target, result) {
+		if (result.$ === 'Nothing') {
+			return 'Error';
+		} else {
+			var val = result.a;
+			return _Utils_eq(val, target) ? 'Passing' : 'Error';
+		}
+	});
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
@@ -5401,7 +5410,7 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$Events$onInput($author$project$Main$Change),
 						$elm$html$Html$Attributes$rows(20),
 						$elm$html$Html$Attributes$cols(40),
-						$elm$html$Html$Attributes$class('bg-secondary text-light border-1 border-dark p-2')
+						$elm$html$Html$Attributes$class('bg-dark text-white-50 border-1 border-secondary p-2')
 					]),
 				_List_Nil),
 				A2(
@@ -5427,7 +5436,29 @@ var $author$project$Main$view = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
+						'Test 1: ' + A2(
+							$author$project$Main$testSolution,
+							37,
+							$author$project$Main$solution1(model)))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
 						'Solution 2: ' + $author$project$Main$viewSolution(
+							$author$project$Main$solution2(model)))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						'Solution 2: ' + A2(
+							$author$project$Main$testSolution,
+							168,
 							$author$project$Main$solution2(model)))
 					]))
 			]));

@@ -62,11 +62,13 @@ view model =
                , onInput Change
                , rows 20
                , cols 40
-               , class "bg-secondary text-light border-1 border-dark p-2"
+               , class "bg-dark text-white-50 border-1 border-secondary p-2"
                ] []
     , div [] [ text ( "Input: " ++ viewModel model ) ]
     , div [] [ text ( "Solution 1: " ++ viewSolution ( solution1 model ) ) ]
+    , div [] [ text ( "Test 1: " ++ testSolution 37 ( solution1 model ) ) ]
     , div [] [ text ( "Solution 2: " ++ viewSolution ( solution2 model ) ) ]
+    , div [] [ text ( "Solution 2: " ++ testSolution 168 ( solution2 model ) ) ]
     ]
 
 
@@ -83,6 +85,18 @@ viewSolution solution =
             String.fromInt val
         Nothing ->
             "NaN"
+
+
+testSolution : Int -> Maybe Int -> String
+testSolution target result =
+    case result of
+        Nothing ->
+            "Error"
+        Just val ->
+            if val == target then
+                "Passing"
+            else
+                "Error"
 
 
 
