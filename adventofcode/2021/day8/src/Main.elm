@@ -72,7 +72,7 @@ view model =
     , div [] [ text ( "Solution 1: " ++ viewSolution ( solution1 model.input ) ) ]
     , div [] [ text ( "Test 1: " ++ testSolution 26 ( solution1 (parseInput defaultContent) ) ) ]
     , div [] [ text ( "Solution 2: " ++ viewSolution ( solution2 model.input ) ) ]
-    , div [] [ text ( "Test 2: " ++ testSolution 26 ( solution2 (parseInput defaultContent) ) ) ]
+    , div [] [ text ( "Test 2: " ++ testSolution 61229 ( solution2 (parseInput defaultContent) ) ) ]
     ]
 
 

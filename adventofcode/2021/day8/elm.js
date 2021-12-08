@@ -5565,7 +5565,7 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$text(
 						'Test 2: ' + A2(
 							$author$project$Main$testSolution,
-							26,
+							61229,
 							$author$project$Main$solution2(
 								$author$project$Main$parseInput($author$project$Main$defaultContent))))
 					]))
