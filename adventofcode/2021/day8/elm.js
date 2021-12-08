@@ -5435,7 +5435,6 @@ var $author$project$Main$solution1 = function (input) {
 		}
 	};
 	var count = function (pair) {
-		var left = pair.a;
 		var right = pair.b;
 		return A3(
 			$elm$core$List$foldl,
@@ -5453,8 +5452,439 @@ var $author$project$Main$solution1 = function (input) {
 			0,
 			input));
 };
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$core$String$fromList = _String_fromList;
+var $elm$core$Dict$Black = {$: 'Black'};
+var $elm$core$Dict$RBNode_elm_builtin = F5(
+	function (a, b, c, d, e) {
+		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
+	});
+var $elm$core$Dict$Red = {$: 'Red'};
+var $elm$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
+			var _v1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+				var _v3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					key,
+					value,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					rK,
+					rV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
+				var _v5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _v6 = left.d;
+				var _v7 = _v6.a;
+				var llK = _v6.b;
+				var llV = _v6.c;
+				var llLeft = _v6.d;
+				var llRight = _v6.e;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					lK,
+					lV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
+			} else {
+				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
+			}
+		}
+	});
+var $elm$core$Basics$compare = _Utils_compare;
+var $elm$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _v1 = A2($elm$core$Basics$compare, key, nKey);
+			switch (_v1.$) {
+				case 'LT':
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3($elm$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 'EQ':
+					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3($elm$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var $elm$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $elm$core$Basics$not = _Basics_not;
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $author$project$Main$compileCypher = function (strings) {
+	var toStr = $elm$core$String$fromChar;
+	var len = $elm$core$String$length;
+	var len5 = A2(
+		$elm$core$List$filter,
+		function (str) {
+			return len(str) === 5;
+		},
+		strings);
+	var len6 = A2(
+		$elm$core$List$filter,
+		function (str) {
+			return len(str) === 6;
+		},
+		strings);
+	var lenN = F2(
+		function (number, _default) {
+			return A3(
+				$elm$core$List$foldl,
+				F2(
+					function (str, acc) {
+						return _Utils_eq(
+							len(str),
+							number) ? str : acc;
+					}),
+				_default,
+				strings);
+		});
+	var has = $elm$core$String$contains;
+	var hasChar = function (_char) {
+		return has(
+			toStr(_char));
+	};
+	var notHasChar = function (_char) {
+		return A2(
+			$elm$core$Basics$composeL,
+			$elm$core$Basics$not,
+			hasChar(_char));
+	};
+	var cf = A2(lenN, 2, 'cf');
+	var bdcf = A2(lenN, 4, 'bdcf');
+	var bd = $elm$core$String$fromList(
+		A2(
+			$elm$core$List$filter,
+			function (_char) {
+				return A2(notHasChar, _char, cf);
+			},
+			$elm$core$String$toList(bdcf)));
+	var all = 'abcdefg';
+	var common = function (strs) {
+		return $elm$core$String$fromList(
+			A3(
+				$elm$core$List$foldl,
+				F2(
+					function (str, remaining) {
+						return A2(
+							$elm$core$List$filter,
+							function (_char) {
+								return A2(hasChar, _char, str);
+							},
+							remaining);
+					}),
+				$elm$core$String$toList(all),
+				strs));
+	};
+	var adg = common(len5);
+	var acf = A2(lenN, 3, 'acf');
+	var abfg = common(len6);
+	var a = A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_char, acc) {
+				return A2(notHasChar, _char, cf) ? _char : acc;
+			}),
+		_Utils_chr('a'),
+		$elm$core$String$toList(acf));
+	var abdcf = _Utils_ap(
+		toStr(a),
+		bdcf);
+	var eg = $elm$core$String$fromList(
+		A2(
+			$elm$core$List$filter,
+			function (_char) {
+				return A2(notHasChar, _char, abdcf);
+			},
+			$elm$core$String$toList(all)));
+	var bfg = $elm$core$String$fromList(
+		A2(
+			$elm$core$List$filter,
+			function (chr) {
+				return !_Utils_eq(chr, a);
+			},
+			$elm$core$String$toList(abfg)));
+	var dg = $elm$core$String$fromList(
+		A2(
+			$elm$core$List$filter,
+			function (chr) {
+				return !_Utils_eq(chr, a);
+			},
+			$elm$core$String$toList(adg)));
+	var d = A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_char, acc) {
+				return A2(hasChar, _char, bd) ? _char : acc;
+			}),
+		_Utils_chr('d'),
+		$elm$core$String$toList(dg));
+	var b = A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_char, acc) {
+				return (!_Utils_eq(_char, d)) ? _char : acc;
+			}),
+		_Utils_chr('b'),
+		$elm$core$String$toList(bd));
+	var g = A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_char, acc) {
+				return (!_Utils_eq(_char, d)) ? _char : acc;
+			}),
+		_Utils_chr('g'),
+		$elm$core$String$toList(dg));
+	var e = A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_char, acc) {
+				return (!_Utils_eq(_char, g)) ? _char : acc;
+			}),
+		_Utils_chr('e'),
+		$elm$core$String$toList(eg));
+	var f = A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_char, acc) {
+				return ((!_Utils_eq(_char, b)) && (!_Utils_eq(_char, g))) ? _char : acc;
+			}),
+		_Utils_chr('f'),
+		$elm$core$String$toList(bfg));
+	var allExceptC = $elm$core$String$fromList(
+		_List_fromArray(
+			[a, b, d, e, f, g]));
+	var c = A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_char, acc) {
+				return A2(notHasChar, _char, allExceptC) ? _char : acc;
+			}),
+		_Utils_chr('c'),
+		$elm$core$String$toList(all));
+	return A3(
+		$elm$core$Dict$insert,
+		g,
+		_Utils_chr('g'),
+		A3(
+			$elm$core$Dict$insert,
+			f,
+			_Utils_chr('f'),
+			A3(
+				$elm$core$Dict$insert,
+				e,
+				_Utils_chr('e'),
+				A3(
+					$elm$core$Dict$insert,
+					d,
+					_Utils_chr('d'),
+					A3(
+						$elm$core$Dict$insert,
+						c,
+						_Utils_chr('c'),
+						A3(
+							$elm$core$Dict$insert,
+							b,
+							_Utils_chr('b'),
+							A3(
+								$elm$core$Dict$insert,
+								a,
+								_Utils_chr('a'),
+								$elm$core$Dict$empty)))))));
+};
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $elm$core$List$sortBy = _List_sortBy;
+var $elm$core$List$sort = function (xs) {
+	return A2($elm$core$List$sortBy, $elm$core$Basics$identity, xs);
+};
+var $author$project$Main$lightToNumber = function (light) {
+	var _v0 = $elm$core$String$fromList(
+		$elm$core$List$sort(light));
+	switch (_v0) {
+		case 'cf':
+			return $elm$core$Maybe$Just(1);
+		case 'acf':
+			return $elm$core$Maybe$Just(7);
+		case 'bcdf':
+			return $elm$core$Maybe$Just(4);
+		case 'acdeg':
+			return $elm$core$Maybe$Just(2);
+		case 'acdfg':
+			return $elm$core$Maybe$Just(3);
+		case 'abdfg':
+			return $elm$core$Maybe$Just(5);
+		case 'abcefg':
+			return $elm$core$Maybe$Just(0);
+		case 'abdefg':
+			return $elm$core$Maybe$Just(6);
+		case 'abcdfg':
+			return $elm$core$Maybe$Just(9);
+		case 'abcdefg':
+			return $elm$core$Maybe$Just(8);
+		default:
+			return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Main$decodeLight = F2(
+	function (cypher, light) {
+		return $author$project$Main$lightToNumber(
+			A2(
+				$elm$core$List$filterMap,
+				function (_char) {
+					return A2($elm$core$Dict$get, _char, cypher);
+				},
+				$elm$core$String$toList(light)));
+	});
+var $elm$core$List$sum = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
+};
 var $author$project$Main$solution2 = function (input) {
-	return $elm$core$Maybe$Nothing;
+	var decodeLine = function (pair) {
+		var left = pair.a;
+		var right = pair.b;
+		var cypher = $author$project$Main$compileCypher(left);
+		var decoder = $author$project$Main$decodeLight(cypher);
+		return A2(
+			$elm$core$String$join,
+			'',
+			A2(
+				$elm$core$List$map,
+				$elm$core$String$fromInt,
+				A2($elm$core$List$filterMap, decoder, right)));
+	};
+	return $elm$core$Maybe$Just(
+		$elm$core$List$sum(
+			A2(
+				$elm$core$List$filterMap,
+				$elm$core$String$toInt,
+				A2($elm$core$List$map, decodeLine, input))));
 };
 var $elm$html$Html$Attributes$target = $elm$html$Html$Attributes$stringProperty('target');
 var $author$project$Main$testSolution = F2(
@@ -5471,7 +5901,7 @@ var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$viewModel = function (model) {
-	return 'amount of crabs = ' + $elm$core$String$fromInt(
+	return 'lines to decode = ' + $elm$core$String$fromInt(
 		$elm$core$List$length(model.input));
 };
 var $author$project$Main$viewSolution = function (solution) {

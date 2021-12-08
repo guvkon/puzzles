@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Basics
 import Browser
+import Dict
 import Html exposing (Html, Attribute, div, a, textarea, text)
 import Html.Attributes exposing (class, cols, href, placeholder, rows, target, value)
 import Html.Events exposing (onInput)
@@ -78,8 +79,8 @@ view model =
 
 viewModel : Model -> String
 viewModel model =
-    (++) "amount of crabs = "
-        <| (String.fromInt (List.length model.input))
+    (++) "lines to decode = "
+        <| String.fromInt (List.length model.input)
 
 
 viewSolution : Maybe Int -> String
@@ -117,6 +118,15 @@ linkToInput year day =
 
 
 type alias Input = List (List String, List String)
+
+
+type alias Cypher = Dict.Dict Char Char
+
+
+type alias Solution = Dict.Dict String String
+
+
+type alias Light = List Char
 
 
 defaultContent =
@@ -165,7 +175,7 @@ solution1 input =
         count : (List String, List String) -> Int
         count pair =
             case pair of
-                (left, right) ->
+                (_, right) ->
                     right
                         |> List.foldl (Utils.counter match) 0
     in
@@ -176,6 +186,135 @@ solution1 input =
 
 solution2 : Input -> Maybe Int
 solution2 input =
-    Nothing
+    let
+        decodeLine : (List String, List String) -> String
+        decodeLine pair =
+            case pair of
+                (left, right) ->
+                    let
+                        cypher =
+                            compileCypher left
+                        decoder =
+                            decodeLight cypher
+                    in
+                    right
+                        |> List.filterMap decoder
+                        |> List.map String.fromInt
+                        |> String.join ""
+    in
+    input
+        |> List.map decodeLine
+        |> List.filterMap String.toInt
+        |> List.sum
+        |> Just
 
+
+compileCypher : List String -> Cypher
+compileCypher strings =
+    let
+        len =
+            String.length
+        toStr =
+            String.fromChar
+        has =
+            String.contains
+        hasChar char =
+            has (toStr char)
+        notHasChar char =
+            not << (hasChar char)
+        lenN number default =
+            List.foldl (\str acc -> if len str == number then str else acc ) default strings
+        cf =
+            lenN 2 "cf"
+        acf =
+            lenN 3 "acf"
+        a =
+            List.foldl (\char acc -> if notHasChar char cf then char else acc) 'a' (String.toList acf)
+        bdcf =
+            lenN 4 "bdcf"
+        bd =
+            List.filter (\char -> notHasChar char cf) (String.toList bdcf)
+                |> String.fromList
+        all =
+            "abcdefg"
+        abdcf =
+            (toStr a) ++ bdcf
+        eg =
+            List.filter (\char -> notHasChar char abdcf) (String.toList all)
+                |> String.fromList
+        len6 =
+            List.filter (\str -> len str == 6) strings
+        common strs =
+            List.foldl (\str remaining -> List.filter (\char -> hasChar char str) remaining) (String.toList all) strs
+                |> String.fromList
+        abfg =
+            common len6
+        bfg =
+            List.filter (\chr -> chr /= a) (String.toList abfg)
+                |> String.fromList
+        len5 =
+            List.filter (\str -> len str == 5) strings
+        adg =
+            common len5
+        dg =
+            List.filter (\chr -> chr /= a) (String.toList adg)
+                |> String.fromList
+        d =
+            List.foldl (\char acc -> if hasChar char bd then char else acc) 'd' (String.toList dg)
+        b =
+            List.foldl (\char acc -> if char /= d then char else acc) 'b' (String.toList bd)
+        g =
+            List.foldl (\char acc -> if char /= d then char else acc) 'g' (String.toList dg)
+        e =
+            List.foldl (\char acc -> if char /= g then char else acc) 'e' (String.toList eg)
+        f =
+            List.foldl (\char acc -> if char /= b && char /= g then char else acc) 'f' (String.toList bfg)
+        allExceptC =
+            [a, b, d, e, f, g]
+                |> String.fromList
+        c =
+            List.foldl (\char acc -> if notHasChar char allExceptC then char else acc) 'c' (String.toList all)
+    in
+    Dict.empty
+        |> Dict.insert a 'a'
+        |> Dict.insert b 'b'
+        |> Dict.insert c 'c'
+        |> Dict.insert d 'd'
+        |> Dict.insert e 'e'
+        |> Dict.insert f 'f'
+        |> Dict.insert g 'g'
+
+
+decodeLight : Cypher -> String -> Maybe Int
+decodeLight cypher light =
+    String.toList light
+        |> List.filterMap (\char -> Dict.get char cypher)
+        |> lightToNumber
+
+
+lightToNumber : Light -> Maybe Int
+lightToNumber light =
+    case String.fromList (List.sort light) of
+        "cf" ->
+            Just 1
+        "acf" ->
+            Just 7
+        "bcdf" ->
+            Just 4
+        "acdeg" ->
+            Just 2
+        "acdfg" ->
+            Just 3
+        "abdfg" ->
+            Just 5
+        "abcefg" ->
+            Just 0
+        "abdefg" ->
+            Just 6
+        "abcdfg" ->
+            Just 9
+        "abcdefg" ->
+            Just 8
+        _ ->
+            Nothing
 
