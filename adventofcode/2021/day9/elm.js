@@ -5476,12 +5476,7 @@ var $elm$core$Dict$get = F2(
 			}
 		}
 	});
-var $author$project$Main$solution1 = function (heightmap) {
-	var riskLevel = F2(
-		function (_v3, sum) {
-			var height = _v3.b;
-			return (sum + height) + 1;
-		});
+var $author$project$Main$getLowPoints = function (heightmap) {
 	var isLowPoint = function (_v1) {
 		var _v2 = _v1.a;
 		var x = _v2.a;
@@ -5516,18 +5511,301 @@ var $author$project$Main$solution1 = function (heightmap) {
 			});
 		return A3($elm$core$List$foldl, checkNeighbor, true, neighbors);
 	};
+	return A2(
+		$elm$core$List$filter,
+		isLowPoint,
+		$elm$core$Dict$toList(heightmap));
+};
+var $author$project$Main$solution1 = function (heightmap) {
+	var riskLevel = F2(
+		function (_v0, sum) {
+			var height = _v0.b;
+			return (sum + height) + 1;
+		});
 	return $elm$core$Maybe$Just(
 		A3(
 			$elm$core$List$foldl,
 			riskLevel,
 			0,
-			A2(
-				$elm$core$List$filter,
-				isLowPoint,
-				$elm$core$Dict$toList(heightmap))));
+			$author$project$Main$getLowPoints(heightmap)));
 };
+var $elm$core$List$product = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$mul, 1, numbers);
+};
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $author$project$Main$searchBasin = F3(
+	function (heightmap, basin, nextCoordinates) {
+		searchBasin:
+		while (true) {
+			if (!nextCoordinates.b) {
+				return basin;
+			} else {
+				var step = F2(
+					function (_v6, _v7) {
+						var x = _v6.a;
+						var y = _v6.b;
+						var nextBasin = _v7.a;
+						var nextCoords = _v7.b;
+						var updateBasin = F2(
+							function (neighbor, updatedBasin) {
+								var c = neighbor.a;
+								var h = neighbor.b;
+								return A3($elm$core$Dict$insert, c, h, updatedBasin);
+							});
+						var getNeighbor = function (neighborCoord) {
+							var _v3 = A2($elm$core$Dict$get, neighborCoord, heightmap);
+							if (_v3.$ === 'Nothing') {
+								return $elm$core$Maybe$Nothing;
+							} else {
+								var neighborHeight = _v3.a;
+								var height = A2(
+									$elm$core$Maybe$withDefault,
+									0,
+									A2(
+										$elm$core$Dict$get,
+										_Utils_Tuple2(x, y),
+										heightmap));
+								if ((_Utils_cmp(neighborHeight, height) > 0) && (neighborHeight < 9)) {
+									var _v4 = A2($elm$core$Dict$get, neighborCoord, nextBasin);
+									if (_v4.$ === 'Nothing') {
+										return $elm$core$Maybe$Just(
+											_Utils_Tuple2(neighborCoord, neighborHeight));
+									} else {
+										return $elm$core$Maybe$Nothing;
+									}
+								} else {
+									return $elm$core$Maybe$Nothing;
+								}
+							}
+						};
+						var left = getNeighbor(
+							_Utils_Tuple2(x, y - 1));
+						var right = getNeighbor(
+							_Utils_Tuple2(x, y + 1));
+						var up = getNeighbor(
+							_Utils_Tuple2(x - 1, y));
+						var down = getNeighbor(
+							_Utils_Tuple2(x + 1, y));
+						var neighbors = _List_fromArray(
+							[up, down, left, right]);
+						var validNeighbors = A2($elm$core$List$filterMap, $elm$core$Basics$identity, neighbors);
+						return _Utils_Tuple2(
+							A3($elm$core$List$foldl, updateBasin, nextBasin, validNeighbors),
+							A2(
+								$elm$core$List$append,
+								A2(
+									$elm$core$List$map,
+									function (_v2) {
+										var vnCoords = _v2.a;
+										return vnCoords;
+									},
+									validNeighbors),
+								nextCoords));
+					});
+				var _v1 = A3(
+					$elm$core$List$foldl,
+					step,
+					_Utils_Tuple2(basin, _List_Nil),
+					nextCoordinates);
+				var b = _v1.a;
+				var nc = _v1.b;
+				var $temp$heightmap = heightmap,
+					$temp$basin = b,
+					$temp$nextCoordinates = nc;
+				heightmap = $temp$heightmap;
+				basin = $temp$basin;
+				nextCoordinates = $temp$nextCoordinates;
+				continue searchBasin;
+			}
+		}
+	});
+var $elm$core$List$singleton = function (value) {
+	return _List_fromArray(
+		[value]);
+};
+var $elm$core$List$sortBy = _List_sortBy;
+var $elm$core$List$sort = function (xs) {
+	return A2($elm$core$List$sortBy, $elm$core$Basics$identity, xs);
+};
+var $elm$core$List$takeReverse = F3(
+	function (n, list, kept) {
+		takeReverse:
+		while (true) {
+			if (n <= 0) {
+				return kept;
+			} else {
+				if (!list.b) {
+					return kept;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs,
+						$temp$kept = A2($elm$core$List$cons, x, kept);
+					n = $temp$n;
+					list = $temp$list;
+					kept = $temp$kept;
+					continue takeReverse;
+				}
+			}
+		}
+	});
+var $elm$core$List$takeTailRec = F2(
+	function (n, list) {
+		return $elm$core$List$reverse(
+			A3($elm$core$List$takeReverse, n, list, _List_Nil));
+	});
+var $elm$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var _v0 = _Utils_Tuple2(n, list);
+			_v0$1:
+			while (true) {
+				_v0$5:
+				while (true) {
+					if (!_v0.b.b) {
+						return list;
+					} else {
+						if (_v0.b.b.b) {
+							switch (_v0.a) {
+								case 1:
+									break _v0$1;
+								case 2:
+									var _v2 = _v0.b;
+									var x = _v2.a;
+									var _v3 = _v2.b;
+									var y = _v3.a;
+									return _List_fromArray(
+										[x, y]);
+								case 3:
+									if (_v0.b.b.b.b) {
+										var _v4 = _v0.b;
+										var x = _v4.a;
+										var _v5 = _v4.b;
+										var y = _v5.a;
+										var _v6 = _v5.b;
+										var z = _v6.a;
+										return _List_fromArray(
+											[x, y, z]);
+									} else {
+										break _v0$5;
+									}
+								default:
+									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
+										var _v7 = _v0.b;
+										var x = _v7.a;
+										var _v8 = _v7.b;
+										var y = _v8.a;
+										var _v9 = _v8.b;
+										var z = _v9.a;
+										var _v10 = _v9.b;
+										var w = _v10.a;
+										var tl = _v10.b;
+										return (ctr > 1000) ? A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
+									} else {
+										break _v0$5;
+									}
+							}
+						} else {
+							if (_v0.a === 1) {
+								break _v0$1;
+							} else {
+								break _v0$5;
+							}
+						}
+					}
+				}
+				return list;
+			}
+			var _v1 = _v0.b;
+			var x = _v1.a;
+			return _List_fromArray(
+				[x]);
+		}
+	});
+var $elm$core$List$take = F2(
+	function (n, list) {
+		return A3($elm$core$List$takeFast, 0, n, list);
+	});
 var $author$project$Main$solution2 = function (heightmap) {
-	return $author$project$Main$solution1(heightmap);
+	var lowPoints = $author$project$Main$getLowPoints(heightmap);
+	var basins = A2(
+		$elm$core$List$map,
+		function (_v0) {
+			var point = _v0.a;
+			var height = _v0.b;
+			return A3(
+				$author$project$Main$searchBasin,
+				heightmap,
+				A3($elm$core$Dict$insert, point, height, $elm$core$Dict$empty),
+				$elm$core$List$singleton(point));
+		},
+		lowPoints);
+	var basinSizes = A2(
+		$elm$core$List$map,
+		function (basin) {
+			return $elm$core$List$length(
+				$elm$core$Dict$toList(basin));
+		},
+		basins);
+	return $elm$core$Maybe$Just(
+		$elm$core$List$product(
+			A2(
+				$elm$core$List$take,
+				3,
+				$elm$core$List$reverse(
+					$elm$core$List$sort(basinSizes)))));
 };
 var $elm$html$Html$Attributes$target = $elm$html$Html$Attributes$stringProperty('target');
 var $author$project$Main$testSolution = F2(
