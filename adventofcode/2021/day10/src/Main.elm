@@ -72,7 +72,7 @@ view model =
     , div [] [ text ( "Solution 1: " ++ viewSolution ( solution1 model.input ) ) ]
     , div [] [ text ( "Test 1: " ++ testSolution 26397 ( solution1 (parseInput defaultContent) ) ) ]
     , div [] [ text ( "Solution 2: " ++ viewSolution ( solution2 model.input ) ) ]
-    , div [] [ text ( "Test 2: " ++ testSolution 26397 ( solution2 (parseInput defaultContent) ) ) ]
+    , div [] [ text ( "Test 2: " ++ testSolution 288957 ( solution2 (parseInput defaultContent) ) ) ]
     ]
 
 
@@ -154,7 +154,37 @@ solution1 input =
 
 solution2 : Input -> Maybe Int
 solution2 input =
-    Nothing
+    let
+        getBracketsForIncompleteChunk string =
+            case tokenSearch string of
+                { openBrackets, illegalToken } ->
+                    case illegalToken of
+                        Nothing ->
+                            case openBrackets of
+                                [] ->
+                                    Nothing
+                                xs ->
+                                    Just xs
+                        Just _ ->
+                            Nothing
+        calculateIncompleteChunkScore brackets =
+            brackets
+                |> List.foldl (\char score -> 5 * score + (charToScore char)) 0
+        charToScore char =
+            case char of
+                '(' -> 1
+                '[' -> 2
+                '{' -> 3
+                '<' -> 4
+                _ -> 0
+        scores =
+            input
+                |> List.filterMap getBracketsForIncompleteChunk
+                |> List.map calculateIncompleteChunkScore
+                |> List.sort
+    in
+    Utils.element ((List.length scores) // 2) scores
+
 
 
 openingBrackets =
@@ -165,8 +195,8 @@ closingBrackets =
     [')', '}', ']', '>']
 
 
-getIllegalToken : String -> Maybe Char
-getIllegalToken string =
+tokenSearch : String -> TokenSearch
+tokenSearch string =
     let
         step : Char -> TokenSearch -> TokenSearch
         step char search =
@@ -186,11 +216,14 @@ getIllegalToken string =
                                         { search | openBrackets = char :: x :: xs }
                         Just _ ->
                             search
-        tokenSearch =
-            String.toList string
-                |> List.foldl step (TokenSearch [] Nothing)
     in
-    case tokenSearch of
+    String.toList string
+        |> List.foldl step (TokenSearch [] Nothing)
+
+
+getIllegalToken : String -> Maybe Char
+getIllegalToken string =
+    case tokenSearch string of
         { illegalToken } ->
             illegalToken
 
