@@ -5294,20 +5294,6 @@ var $elm$html$Html$Attributes$rows = function (n) {
 		'rows',
 		$elm$core$String$fromInt(n));
 };
-var $author$project$Main$calculateCorruptedChunkScore = function (_char) {
-	switch (_char.valueOf()) {
-		case ')':
-			return 3;
-		case ']':
-			return 57;
-		case '}':
-			return 1197;
-		case '>':
-			return 25137;
-		default:
-			return 0;
-	}
-};
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
 		var _v0 = f(mx);
@@ -5326,17 +5312,13 @@ var $elm$core$List$filterMap = F2(
 			_List_Nil,
 			xs);
 	});
+var $elm$core$List$sum = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
+};
 var $author$project$Main$TokenSearch = F2(
 	function (openBrackets, illegalToken) {
 		return {illegalToken: illegalToken, openBrackets: openBrackets};
 	});
-var $author$project$Main$closingBrackets = _List_fromArray(
-	[
-		_Utils_chr(')'),
-		_Utils_chr('}'),
-		_Utils_chr(']'),
-		_Utils_chr('>')
-	]);
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -5372,6 +5354,13 @@ var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
 var $author$project$Main$tokenSearch = function (string) {
+	var closingBrackets = _List_fromArray(
+		[
+			_Utils_chr(')'),
+			_Utils_chr('}'),
+			_Utils_chr(']'),
+			_Utils_chr('>')
+		]);
 	var step = F2(
 		function (_char, search) {
 			var openBrackets = search.openBrackets;
@@ -5404,7 +5393,7 @@ var $author$project$Main$tokenSearch = function (string) {
 						_char,
 						_Utils_chr('>')))))) ? _Utils_update(
 						search,
-						{openBrackets: xs}) : (A2($elm$core$List$member, _char, $author$project$Main$closingBrackets) ? _Utils_update(
+						{openBrackets: xs}) : (A2($elm$core$List$member, _char, closingBrackets) ? _Utils_update(
 						search,
 						{
 							illegalToken: $elm$core$Maybe$Just(_char)
@@ -5427,21 +5416,32 @@ var $author$project$Main$tokenSearch = function (string) {
 		A2($author$project$Main$TokenSearch, _List_Nil, $elm$core$Maybe$Nothing),
 		$elm$core$String$toList(string));
 };
-var $author$project$Main$getIllegalToken = function (string) {
-	var _v0 = $author$project$Main$tokenSearch(string);
-	var illegalToken = _v0.illegalToken;
-	return illegalToken;
-};
-var $elm$core$List$sum = function (numbers) {
-	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
-};
 var $author$project$Main$solution1 = function (input) {
+	var getIllegalToken = function (string) {
+		var _v1 = $author$project$Main$tokenSearch(string);
+		var illegalToken = _v1.illegalToken;
+		return illegalToken;
+	};
+	var calculateCorruptedChunkScore = function (_char) {
+		switch (_char.valueOf()) {
+			case ')':
+				return 3;
+			case ']':
+				return 57;
+			case '}':
+				return 1197;
+			case '>':
+				return 25137;
+			default:
+				return 0;
+		}
+	};
 	return $elm$core$Maybe$Just(
 		$elm$core$List$sum(
 			A2(
 				$elm$core$List$map,
-				$author$project$Main$calculateCorruptedChunkScore,
-				A2($elm$core$List$filterMap, $author$project$Main$getIllegalToken, input))));
+				calculateCorruptedChunkScore,
+				A2($elm$core$List$filterMap, getIllegalToken, input))));
 };
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {

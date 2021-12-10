@@ -145,6 +145,20 @@ parseInput string =
 
 solution1 : Input -> Maybe Int
 solution1 input =
+    let
+        getIllegalToken string =
+            case tokenSearch string of
+                { illegalToken } ->
+                    illegalToken
+
+        calculateCorruptedChunkScore char =
+            case char of
+                ')' -> 3
+                ']' -> 57
+                '}' -> 1197
+                '>' -> 25137
+                _ -> 0
+    in
     input
         |> List.filterMap getIllegalToken
         |> List.map calculateCorruptedChunkScore
@@ -186,19 +200,12 @@ solution2 input =
     Utils.element ((List.length scores) // 2) scores
 
 
-
-openingBrackets =
-    ['(', '{', '[', '<']
-
-
-closingBrackets =
-    [')', '}', ']', '>']
-
-
 tokenSearch : String -> TokenSearch
 tokenSearch string =
     let
-        step : Char -> TokenSearch -> TokenSearch
+        closingBrackets =
+            [')', '}', ']', '>']
+
         step char search =
             case search of
                 { openBrackets, illegalToken } ->
@@ -219,26 +226,4 @@ tokenSearch string =
     in
     String.toList string
         |> List.foldl step (TokenSearch [] Nothing)
-
-
-getIllegalToken : String -> Maybe Char
-getIllegalToken string =
-    case tokenSearch string of
-        { illegalToken } ->
-            illegalToken
-
-
-calculateCorruptedChunkScore : Char -> Int
-calculateCorruptedChunkScore char =
-    case char of
-        ')' ->
-            3
-        ']' ->
-            57
-        '}' ->
-            1197
-        '>' ->
-            25137
-        _ ->
-            0
 
