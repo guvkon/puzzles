@@ -17,6 +17,16 @@ def solve1(data: str) -> Optional[Union[str, int]]:
 
 
 def solve2(data: str) -> Optional[Union[str, int]]:
+    floor = 0
+    index = 1
+    for char in data:
+        if char == '(':
+            floor += 1
+        elif char == ')':
+            floor -= 1
+        if floor == -1:
+            return index
+        index += 1
     return None
 
 
@@ -44,14 +54,14 @@ if __name__ == '__main__':
             slv = func(solve['test_data'])
             answer = solve['test_answer']
             if slv == answer:
-                print(f'Solution {number} - Test has passed.')
+                print(f'Solution {number} - Test has passed')
             else:
-                print(f'Solution {number} - Test has failed. Should be {answer}, got {slv}.')
+                print(f'Solution {number} - Test has failed. Should be {answer}, got {slv}')
                 number += 1
                 continue
 
             slv = func(data)
             if slv is not None:
-                print(f'Solution {number} - The answer: {slv}.')
+                print(f'Solution {number} - The answer: {slv}')
             number += 1
 
