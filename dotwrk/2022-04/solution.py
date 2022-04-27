@@ -3,18 +3,33 @@
 from typing import Optional, Union
 
 
+## Solutions ##
+
+
 def solve1(data: str) -> Optional[Union[str, int]]:
-    return len(data)
+    floor = 0
+    for char in data:
+        if char == '(':
+            floor += 1
+        elif char == ')':
+            floor -= 1
+    return floor
 
 
 def solve2(data: str) -> Optional[Union[str, int]]:
     return None
 
 
+## Solutions with test data ##
+
+
 solves = [
         {'func': solve1, 'test_data': '))(((((', 'test_answer': 3},
         {'func': solve2, 'test_data': '()())', 'test_answer': 5},
 ]
+
+
+## Template for running solutions ##
 
 
 if __name__ == '__main__':
