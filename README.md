@@ -9,3 +9,7 @@ My solutions to various code puzzles and challenges.
 ## .wrk
 
 Solutions for monthly .wrk puzzles are located in `/dotwrk` directory.
+
+## Codility
+
+[Codility](https://app.codility.com/programmers) solutions are located in `/codility` directory.
