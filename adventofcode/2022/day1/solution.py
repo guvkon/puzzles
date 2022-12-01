@@ -1,17 +1,47 @@
 #!/usr/bin/env python3
 
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 
 # ==== Solutions ==== #
 
 
+def get_elves(data: str) -> dict:
+    lines = data.splitlines()
+    elves = []
+    elf = []
+    for line in lines:
+        if not line and len(elf) > 0:
+            elves.append(elf)
+            elf = []
+        else:
+            elf.append(int(line))
+    if len(elf) > 0:
+        elves.append(elf)
+    return elves
+
+
+def count_callories(elves: List[List[int]]) -> List[int]:
+    callories = []
+    for elf in elves:
+        count = 0
+        for callory in elf:
+            count += callory
+        callories.append(count)
+    return callories
+
+
 def solve1(data: str) -> Optional[int]:
-    return None
+    elves = get_elves(data)
+    callories = count_callories(elves)
+    return max(callories)
 
 
 def solve2(data: str) -> Optional[int]:
-    return None
+    elves = get_elves(data)
+    callories = count_callories(elves)
+    callories.sort(reverse=True)
+    return callories[0] + callories[1] + callories[2]
 
 
 # ==== Solutions with test data ==== #
@@ -34,11 +64,11 @@ test_data1 = """1000
 test_answer1 = 24000
 
 test_data2 = test_data1
-test_answer2 = 24000
+test_answer2 = 45000
 
 solves = [
     {'func': solve1, 'test_data': test_data1, 'test_answer': test_answer1},
-    # {'func': solve2, 'test_data': test_data2, 'test_answer': test_answer2},
+    {'func': solve2, 'test_data': test_data2, 'test_answer': test_answer2},
 ]
 
 # ==== Template for running solutions ==== #
