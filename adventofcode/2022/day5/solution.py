@@ -7,11 +7,17 @@ from typing import List, Optional, Tuple, Union
 # ==== Solutions ==== #
 
 
+def parse_input(data: str):
+    pass
+
+
 def solve1(data: str) -> Optional[int]:
+    input = parse_input(data)
     return None
 
 
 def solve2(data: str) -> Optional[int]:
+    input = parse_input(data)
     return None
 
 
