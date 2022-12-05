@@ -11,12 +11,12 @@ def parse_input(data: str):
     pass
 
 
-def solve1(data: str) -> Optional[int]:
+def solve1(data: str) -> Optional[str]:
     input = parse_input(data)
     return None
 
 
-def solve2(data: str) -> Optional[int]:
+def solve2(data: str) -> Optional[str]:
     input = parse_input(data)
     return None
 
@@ -24,12 +24,20 @@ def solve2(data: str) -> Optional[int]:
 # ==== Solutions with test data ==== #
 
 
-test_data1 = """
+test_data1 = """    [D]
+[N] [C]
+[Z] [M] [P]
+ 1   2   3
+
+move 1 from 2 to 1
+move 3 from 1 to 3
+move 2 from 2 to 1
+move 1 from 1 to 2
 """
-test_answer1 = 2
+test_answer1 = 'CMZ'
 
 test_data2 = test_data1
-test_answer2 = 4
+test_answer2 = 'CMZ'
 
 solves = [
     {'func': solve1, 'test_data': test_data1, 'test_answer': test_answer1},
