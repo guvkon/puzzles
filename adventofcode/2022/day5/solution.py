@@ -39,7 +39,7 @@ def parse_input(data: str) -> Input:
             stack = []
             stacks_count = len(line) // 4 + 1
             for index in range(0, stacks_count):
-                stack.append(line[index*(stacks_count+1)+1:index*(stacks_count+1)+2])
+                stack.append(line[index*4+1:index*4+2])
             hstacks.append(stack)
         else:
             # move 12 from 9 to 3
@@ -70,13 +70,40 @@ def parse_input2(data: str) -> Input:
 # === Solutions === #
 
 
+def do_move(stacks: List[List[str]], move: Move, keep_order=False) -> List[List[str]]:
+    moved_stack = []
+    start_idx = move.start - 1
+    end_idx = move.end - 1
+    for _ in range(0, move.amount):
+        if len(stacks[start_idx]) > 0:
+            moved_stack.append(stacks[start_idx].pop())
+    if keep_order:
+        moved_stack.reverse()
+    for crate in moved_stack:
+        stacks[end_idx].append(crate)
+    return stacks
+
+
 def solve1(input: Input) -> Optional[str]:
-    print(input)
-    return None
+    stacks = input.stacks
+    for move in input.moves:
+        stacks = do_move(stacks, move)
+    output = ''
+    for stack in stacks:
+        if len(stack) > 0:
+            output += stack.pop()
+    return output
 
 
 def solve2(input: Input) -> Optional[str]:
-    return None
+    stacks = input.stacks
+    for move in input.moves:
+        stacks = do_move(stacks, move, keep_order=True)
+    output = ''
+    for stack in stacks:
+        if len(stack) > 0:
+            output += stack.pop()
+    return output
 
 
 # ==== Solutions with test data ==== #
@@ -90,16 +117,16 @@ test_data1 = """    [D]
 move 1 from 2 to 1
 move 3 from 1 to 3
 move 2 from 2 to 1
-move 1 from 1 to 2
+move 1 from 1 to 2g
 """
 test_answer1 = 'CMZ'
 
 test_data2 = test_data1
-test_answer2 = 'CMZ'
+test_answer2 = 'MCD'
 
 solves = [
     {'func': solve1, 'parse': parse_input1, 'test_data': test_data1, 'test_answer': test_answer1},
-    # {'func': solve2, 'parse': parse_input2, 'test_data': test_data2, 'test_answer': test_answer2},
+    {'func': solve2, 'parse': parse_input2, 'test_data': test_data2, 'test_answer': test_answer2},
 ]
 
 # ==== Template for running solutions ==== #
