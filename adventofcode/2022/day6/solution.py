@@ -18,14 +18,14 @@ def splitlines(data: str) -> List[str]:
 
 @dataclass
 class Input:
-    items: list
+    stream: str
 
 
 # === Input parsing === #
 
 
 def parse_input(data: str) -> Input:
-    return Input(splitlines(data))
+    return Input(data.strip())
 
 
 def parse_input1(data: str) -> Input:
@@ -39,23 +39,31 @@ def parse_input2(data: str) -> Input:
 # === Solutions === #
 
 
-def solve1(input: Input) -> Optional[str]:
+def solve1(input: Input) -> Optional[int]:
+    for index in range(0, len(input.stream) - 4):
+        chunk = input.stream[index:index+4]
+        if len(set(chunk)) == 4:
+            return index + 4
     return None
 
 
-def solve2(input: Input) -> Optional[str]:
+def solve2(input: Input) -> Optional[int]:
+    for index in range(0, len(input.stream) - 14):
+        chunk = input.stream[index:index+14]
+        if len(set(chunk)) == 14:
+            return index + 14
     return None
 
 
 # ==== Solutions with test data ==== #
 
 
-test_data1 = """
+test_data1 = """mjqjpqmgbljsphdztnvjfqwrcgsmlb
 """
-test_answer1 = 0
+test_answer1 = 7
 
 test_data2 = test_data1
-test_answer2 = 0
+test_answer2 = 19
 
 solves = [
     {'func': solve1, 'parse': parse_input1, 'test_data': test_data1, 'test_answer': test_answer1},
