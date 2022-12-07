@@ -63,7 +63,7 @@ def parse_input(data: str) -> Input:
         if is_command:
             parts = line[2:].split(' ')
             cmd = Command(parts[0], parts[1] if len(parts) > 1 else None)
-            output =  Output(cmd, [])
+            output = Output(cmd, [])
             outputs.append(output)
         elif output is not None:
             output.output.append(line)
@@ -83,7 +83,6 @@ def parse_input2(data: str) -> Input:
 
 def pwd2str(pwd: List[str]) -> str:
     return '/' + '/'.join(pwd)
-    
 
 
 def build_directory_tree(outputs: List[Output]) -> Dict[str, Directory]:
@@ -131,7 +130,6 @@ def calculate_size(node: Node) -> int:
     for child in node.children:
         node.size += calculate_size(child)
     return node.size
-
 
 
 def solve1(input: Input) -> Optional[int]:
@@ -193,8 +191,10 @@ test_data2 = test_data1
 test_answer2 = 24933642
 
 solves = [
-    {'func': solve1, 'parse': parse_input1, 'test_data': test_data1, 'test_answer': test_answer1},
-    {'func': solve2, 'parse': parse_input2, 'test_data': test_data2, 'test_answer': test_answer2},
+    {'func': solve1, 'parse': parse_input1,
+        'test_data': test_data1, 'test_answer': test_answer1},
+    {'func': solve2, 'parse': parse_input2,
+        'test_data': test_data2, 'test_answer': test_answer2},
 ]
 
 # ==== Template for running solutions ==== #
