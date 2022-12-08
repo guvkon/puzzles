@@ -10,7 +10,7 @@ from typing import List, Optional, Tuple, Union
 
 
 def splitlines(data: str) -> List[str]:
-    return [line for line in data.splitlines() if not line]
+    return [line for line in data.splitlines() if line]
 
 
 # ==== Types ==== #
