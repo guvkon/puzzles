@@ -1,3 +1,3 @@
 #!/bin/zsh
 
-aoc -y 2022 -d 12 d -i input.txt --input-only --overwrite
+aoc -y 2023 -d 1 d -i input.txt --input-only --overwrite
