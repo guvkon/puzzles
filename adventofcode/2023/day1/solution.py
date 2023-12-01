@@ -86,9 +86,9 @@ def solve2(input: Input) -> Optional[int]:
     numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
     sum = 0
     for line in input.lines:
-        print(line)
         number = ''
 
+        # Find left digit.
         left_index = len(line) - 1
         left_number = ''
         for num in numbers:
@@ -96,10 +96,9 @@ def solve2(input: Input) -> Optional[int]:
             if -1 < index <= left_index:
                 left_index = index
                 left_number = num
-                print(f'left {index} - {num}')
-
         number += text_to_number(left_number)
 
+        # Find right digit.
         right_index = 0
         right_number = ''
         for num in numbers:
@@ -107,10 +106,9 @@ def solve2(input: Input) -> Optional[int]:
             if index > -1 and index >= right_index:
                 right_index = index
                 right_number = num
-                print(f'right {index} - {num}')
         number += text_to_number(right_number)
-        print(f'number {number}')
 
+        # Sum.
         sum += int(number)
 
     return sum
