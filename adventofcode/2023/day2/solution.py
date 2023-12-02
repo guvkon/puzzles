@@ -18,17 +18,60 @@ def splitlines(data: str, fun=lambda x: x) -> List[str]:
 # === Types === #
 
 
+class Color(Enum):
+    blue = 'blue'
+    red = 'red'
+    green = 'green'
+
+
+@dataclass
+class ColoredBalls:
+    number: int
+    color: Color
+
+
+@dataclass
+class BallSet:
+    balls: List[ColoredBalls]
+
+
+@dataclass
+class Game:
+    id: int
+    sets: List[BallSet]
+    line: str
+
+
 @dataclass
 class Input:
     lines: List[str]
+    games: List[Game]
 
 
 # === Input parsing === #
 
 
+def parse_sets(line: str) -> List[BallSet]:
+    sets = []
+    for part in line.split(';'):
+        colored_balls = []
+        for ball_group in part.strip().split(','):
+            info = ball_group.strip().split(' ')
+            colored_balls.append(ColoredBalls(int(info[0]), Color(info[1])))
+        sets.append(BallSet(colored_balls))
+    return sets
+
+
+def parse_line(line: str) -> Game:
+    regex = r"Game (\d+): (.+)"
+    result = re.match(regex, line)
+    return Game(int(result[1]), parse_sets(result[2]), line)
+
+
 def parse_input(data: str, options: dict) -> Input:
     lines = splitlines(data)
-    return Input(lines)
+    games = [parse_line(line) for line in lines]
+    return Input(lines, games)
 
 
 def parse_input1(data: str) -> Input:
@@ -42,12 +85,45 @@ def parse_input2(data: str) -> Input:
 # === Solutions === #
 
 
+def is_game_possible(game: Game) -> bool:
+    limits = {
+        Color.red: 12,
+        Color.green: 13,
+        Color.blue: 14,
+    }
+    for set in game.sets:
+        for ball in set.balls:
+            if limits[ball.color] < ball.number:
+                return False
+    return True
+
+
 def solve1(input: Input) -> Optional[int]:
-    return None
+    sum = 0
+    for game in input.games:
+        if is_game_possible(game):
+            sum += game.id
+    return sum
+
+
+def game_power(game: Game) -> int:
+    floors = {
+        Color.red: 0,
+        Color.green: 0,
+        Color.blue: 0,
+    }
+    for set in game.sets:
+        for ball in set.balls:
+            if floors[ball.color] < ball.number:
+                floors[ball.color] = ball.number
+    return floors[Color.red] * floors[Color.green] * floors[Color.blue]
 
 
 def solve2(input: Input) -> Optional[int]:
-    return None
+    total_power = 0
+    for game in input.games:
+        total_power += game_power(game)
+    return total_power
 
 
 # ==== Solutions with test data ==== #
@@ -61,13 +137,13 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"""
 test_answer1 = 8
 
 test_data2 = test_data1
-test_answer2 = 0
+test_answer2 = 2286
 
 solves = [
     {'func': solve1, 'parse': parse_input1,
-        'test_data': test_data1, 'test_answer': test_answer1},
+     'test_data': test_data1, 'test_answer': test_answer1},
     {'func': solve2, 'parse': parse_input2,
-        'test_data': test_data2, 'test_answer': test_answer2},
+     'test_data': test_data2, 'test_answer': test_answer2},
 ]
 
 # ==== Template for running solutions ==== #
