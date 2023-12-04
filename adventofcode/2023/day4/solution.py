@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional, Tuple, Union, Dict, Set, Callable
 from time import time_ns
-from functools import wraps
+from functools import wraps, cache
 
 
 # === Useful Functions === #
@@ -23,7 +23,7 @@ def timer(f):
         start = time_ns()
         result = f(*args, **kwargs)
         delta = (time_ns() - start) / 1000000.0
-        print(f'Elapsed time: {delta} ms')
+        print(f'Elapsed time of {f.__name__}: {delta} ms')
         return result
 
     return wrapper
@@ -60,6 +60,7 @@ def parse_line(line: str) -> Card:
     )
 
 
+@timer
 def parse_input(data: str, options: dict) -> Input:
     lines = splitlines(data)
     cards = [parse_line(line) for line in lines]
@@ -133,7 +134,8 @@ solves = [
 # ==== Template for running solutions ==== #
 
 
-if __name__ == '__main__':
+@timer
+def main():
     filename = 'input.txt'
     with open(filename, 'r') as f:
         input = f.read()
@@ -157,3 +159,7 @@ if __name__ == '__main__':
             if slv is not None:
                 print(f'Solution {number} - The answer:\n{slv}')
             number += 1
+
+
+if __name__ == '__main__':
+    main()
