@@ -6,6 +6,8 @@ import sys
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional, Tuple, Union, Dict, Set, Callable
+from time import time_ns
+from functools import wraps
 
 
 # === Useful Functions === #
@@ -15,20 +17,53 @@ def splitlines(data: str, fun=lambda x: x) -> List[str]:
     return [fun(line) for line in data.splitlines() if line]
 
 
+def timer(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        start = time_ns()
+        result = f(*args, **kwargs)
+        delta = (time_ns() - start) / 1000000.0
+        print(f'Elapsed time: {delta} ms')
+        return result
+
+    return wrapper
+
+
 # === Types === #
+
+
+@dataclass
+class Card:
+    id: int
+    winning_numbers: List[int]
+    numbers_got: List[int]
+    line: str
 
 
 @dataclass
 class Input:
     lines: List[str]
+    cards: List[Card]
 
 
 # === Input parsing === #
 
 
+def parse_line(line: str) -> Card:
+    regex = r"Card +(\d+): (.+) \| (.+)"
+    result = re.match(regex, line)
+    return Card(
+        int(result[1]),
+        [int(n.strip()) for n in re.sub(r' +', ' ', result[2].strip()).split(' ')],
+        [int(n.strip()) for n in re.sub(r' +', ' ', result[3].strip()).split(' ')],
+        line
+    )
+
+
 def parse_input(data: str, options: dict) -> Input:
     lines = splitlines(data)
-    return Input(lines)
+    cards = [parse_line(line) for line in lines]
+    return Input(lines, cards)
 
 
 def parse_input1(data: str) -> Input:
@@ -42,12 +77,36 @@ def parse_input2(data: str) -> Input:
 # === Solutions === #
 
 
+def count_winners(card: Card) -> int:
+    winners = 0
+    for num in card.winning_numbers:
+        if num in card.numbers_got:
+            winners += 1
+    return winners
+
+
+@timer
 def solve1(input: Input) -> Optional[int]:
-    return None
+    sum = 0
+    for card in input.cards:
+        winners = count_winners(card)
+        if winners:
+            sum += pow(2, winners - 1)
+    return sum
 
 
+@timer
 def solve2(input: Input) -> Optional[int]:
-    return None
+    sum = 0
+    extra_cards = {}
+    for card in input.cards:
+        extra = extra_cards.get(card.id, 0)
+        winners = count_winners(card)
+        if winners:
+            for idx in range(card.id + 1, card.id + 1 + winners):
+                extra_cards[idx] = extra_cards.get(idx, 0) + 1 + extra
+        sum += 1 + extra
+    return sum
 
 
 # ==== Solutions with test data ==== #
@@ -62,7 +121,7 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11"""
 test_answer1 = 13
 
 test_data2 = test_data1
-test_answer2 = 0
+test_answer2 = 30
 
 solves = [
     {'func': solve1, 'parse': parse_input1,
