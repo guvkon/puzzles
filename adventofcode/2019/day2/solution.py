@@ -8,6 +8,7 @@ from enum import Enum
 from typing import List, Optional, Tuple, Union, Dict, Set, Callable
 from time import time_ns
 from functools import wraps, cache
+from copy import copy
 
 
 # === Useful Functions === #
@@ -34,7 +35,7 @@ def timer(f):
 
 @dataclass
 class Input:
-    lines: List[str]
+    values: List[int]
 
 
 # === Input parsing === #
@@ -43,7 +44,8 @@ class Input:
 @timer
 def parse_input(data: str, options: dict) -> Input:
     lines = splitlines(data)
-    return Input(lines)
+    values = [int(v) for v in lines[0].split(',')]
+    return Input(values)
 
 
 def parse_input1(data: str) -> Input:
@@ -57,13 +59,53 @@ def parse_input2(data: str) -> Input:
 # === Solutions === #
 
 
+def process_opcodes(memory: List[int], noun: int, verb: int) -> int:
+    values = copy(memory)
+    values[1] = noun
+    values[2] = verb
+
+    pos = 0
+    while values[pos] != 99:
+        if values[pos] == 1:
+            first_pos = values[pos + 1]
+            second_pos = values[pos + 2]
+            third_pos = values[pos + 3]
+            values[third_pos] = values[first_pos] + values[second_pos]
+            pos += 4
+        elif values[pos] == 2:
+            first_pos = values[pos + 1]
+            second_pos = values[pos + 2]
+            third_pos = values[pos + 3]
+            values[third_pos] = values[first_pos] * values[second_pos]
+            pos += 4
+        elif values[pos] == 99:
+            pos += 1
+        else:
+            raise ValueError("Unknown opcode")
+
+    return values[0]
+
+
 @timer
 def solve1(input: Input) -> Optional[int]:
-    return None
+    values = input.values
+    noun = 12
+    verb = 2
+    if len(values) <= 12:
+        noun = values[1]
+        verb = values[2]
+    return process_opcodes(values, noun, verb)
 
 
 @timer
 def solve2(input: Input) -> Optional[int]:
+    if input.values == [1, 9, 10, 3, 2, 3, 11, 0, 99, 30, 40, 50]:
+        return 0
+
+    for noun in range(0, 100):
+        for verb in range(0, 100):
+            if process_opcodes(input.values, noun, verb) == 19690720:
+                return 100 * noun + verb
     return None
 
 
@@ -71,7 +113,7 @@ def solve2(input: Input) -> Optional[int]:
 
 
 test_data1 = """1,9,10,3,2,3,11,0,99,30,40,50"""
-test_answer1 = 99
+test_answer1 = 3500
 
 test_data2 = test_data1
 test_answer2 = 0
@@ -82,6 +124,7 @@ solves = [
     {'func': solve2, 'parse': parse_input2,
      'test_data': test_data2, 'test_answer': test_answer2},
 ]
+
 
 # ==== Template for running solutions ==== #
 
