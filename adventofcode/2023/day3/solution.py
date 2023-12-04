@@ -29,12 +29,17 @@ def timer(f):
     return wrapper
 
 
+DIGITS = '1234567890'
+
+
 # === Types === #
 
 
 @dataclass
 class Input:
     lines: List[str]
+    width: int
+    height: int
 
 
 # === Input parsing === #
@@ -43,7 +48,10 @@ class Input:
 @timer
 def parse_input(data: str, options: dict) -> Input:
     lines = splitlines(data)
-    return Input(lines)
+    width = len(lines[0])
+    height = len(lines)
+
+    return Input(lines, width, height)
 
 
 def parse_input1(data: str) -> Input:
@@ -58,7 +66,46 @@ def parse_input2(data: str) -> Input:
 
 
 def solve1(input: Input) -> Optional[int]:
-    return None
+    width = input.width
+    height = input.height
+    matrix = input.lines
+
+    def has_adjacent_symbol(start_x, x, y, verbose: bool = False) -> bool:
+        if verbose:
+            print('verbose')
+            print(start_x, x, y)
+        for _y in range(max(0, y - 1), min(y + 2, height)):
+            for _x in range(max(0, start_x - 1), min(x + 1, width)):
+                _val = matrix[_y][_x]
+                if _val not in DIGITS and _val != '.':
+                    return True
+        return False
+
+    part_numbers = []
+    y = 0
+    while y < height:
+        x = 0
+        start_x = x
+        digit = ''
+        x_part_numbers = []
+        while x < width:
+            val = matrix[y][x]
+            if val in DIGITS:
+                if digit == '':
+                    start_x = x
+                digit += val
+            if val not in DIGITS or x == width - 1:
+                # Number has ended.
+                if digit:
+                    if has_adjacent_symbol(start_x, x, y):
+                        part_numbers.append(int(digit))
+                        x_part_numbers.append(int(digit))
+                    digit = ''
+            x += 1
+        print('%5d : %s' % (y, x_part_numbers))
+        y += 1
+
+    return sum(part_numbers)
 
 
 def solve2(input: Input) -> Optional[int]:
@@ -81,7 +128,7 @@ test_data1 = """467..114..
 test_answer1 = 4361
 
 test_data2 = test_data1
-test_answer2 = 0
+test_answer2 = 467835
 
 solves = [
     {'func': solve1, 'parse': parse_input1,
