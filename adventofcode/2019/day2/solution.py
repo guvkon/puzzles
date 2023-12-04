@@ -6,6 +6,8 @@ import sys
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional, Tuple, Union, Dict, Set, Callable
+from time import time_ns
+from functools import wraps, cache
 
 
 # === Useful Functions === #
@@ -13,6 +15,18 @@ from typing import List, Optional, Tuple, Union, Dict, Set, Callable
 
 def splitlines(data: str, fun=lambda x: x) -> List[str]:
     return [fun(line) for line in data.splitlines() if line]
+
+
+def timer(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        start = time_ns()
+        result = f(*args, **kwargs)
+        delta = (time_ns() - start) / 1000000.0
+        print(f'Elapsed time of {f.__name__}: {delta} ms')
+        return result
+
+    return wrapper
 
 
 # === Types === #
@@ -26,6 +40,7 @@ class Input:
 # === Input parsing === #
 
 
+@timer
 def parse_input(data: str, options: dict) -> Input:
     lines = splitlines(data)
     return Input(lines)
@@ -42,10 +57,12 @@ def parse_input2(data: str) -> Input:
 # === Solutions === #
 
 
+@timer
 def solve1(input: Input) -> Optional[int]:
     return None
 
 
+@timer
 def solve2(input: Input) -> Optional[int]:
     return None
 
@@ -69,7 +86,8 @@ solves = [
 # ==== Template for running solutions ==== #
 
 
-if __name__ == '__main__':
+@timer
+def main():
     filename = 'input.txt'
     with open(filename, 'r') as f:
         input = f.read()
@@ -93,3 +111,7 @@ if __name__ == '__main__':
             if slv is not None:
                 print(f'Solution {number} - The answer:\n{slv}')
             number += 1
+
+
+if __name__ == '__main__':
+    main()
