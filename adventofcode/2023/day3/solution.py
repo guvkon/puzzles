@@ -6,7 +6,7 @@ import sys
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional, Tuple, Union, Dict, Set, Callable
-from functools import wraps
+from functools import wraps, cached_property
 from time import time_ns
 
 
@@ -36,10 +36,35 @@ DIGITS = '1234567890'
 
 
 @dataclass
+class PartNumber:
+    start_x: int
+    end_x: int
+    y: int
+    value: int
+
+    @cached_property
+    def length(self):
+        return self.end_x - self.start_x + 1
+
+
+@dataclass
+class Symbol:
+    x: int
+    y: int
+    value: str
+
+    @cached_property
+    def is_star(self):
+        return self.value == '*'
+
+
+@dataclass
 class Input:
     lines: List[str]
     width: int
     height: int
+    part_numbers: List[PartNumber]
+    symbols: List[Symbol]
 
 
 # === Input parsing === #
@@ -51,7 +76,45 @@ def parse_input(data: str, options: dict) -> Input:
     width = len(lines[0])
     height = len(lines)
 
-    return Input(lines, width, height)
+    def is_part_number(start_x, x, y, verbose: bool = False) -> bool:
+        if verbose:
+            print('verbose')
+            print(start_x, x, y)
+        for _y in range(max(0, y - 1), min(y + 2, height)):
+            for _x in range(max(0, start_x - 1), min(x + 1, width)):
+                _val = lines[_y][_x]
+                if _val not in DIGITS and _val != '.':
+                    return True
+        return False
+
+    part_numbers = []
+    symbols = []
+
+    y = 0
+    while y < height:
+        x = 0
+        start_x = x
+        digit = ''
+        while x < width:
+            val = lines[y][x]
+
+            if val not in DIGITS and val != '.':
+                symbols.append(Symbol(x, y, val))
+
+            if val in DIGITS:
+                if digit == '':
+                    start_x = x
+                digit += val
+            if val not in DIGITS or x == width - 1:
+                # Number has ended.
+                if digit:
+                    if is_part_number(start_x, x, y):
+                        part_numbers.append(PartNumber(start_x, x if val in DIGITS else x - 1, y, int(digit)))
+                    digit = ''
+            x += 1
+        y += 1
+
+    return Input(lines, width, height, part_numbers, symbols)
 
 
 def parse_input1(data: str) -> Input:
@@ -65,51 +128,28 @@ def parse_input2(data: str) -> Input:
 # === Solutions === #
 
 
+@timer
 def solve1(input: Input) -> Optional[int]:
+    sum = 0
+    for part_number in input.part_numbers:
+        sum += part_number.value
+    return sum
+
+
+@timer
+def solve2(input: Input) -> Optional[int]:
     width = input.width
     height = input.height
-    matrix = input.lines
-
-    def has_adjacent_symbol(start_x, x, y, verbose: bool = False) -> bool:
-        if verbose:
-            print('verbose')
-            print(start_x, x, y)
-        for _y in range(max(0, y - 1), min(y + 2, height)):
-            for _x in range(max(0, start_x - 1), min(x + 1, width)):
-                _val = matrix[_y][_x]
-                if _val not in DIGITS and _val != '.':
-                    return True
-        return False
-
-    part_numbers = []
-    y = 0
-    while y < height:
-        x = 0
-        start_x = x
-        digit = ''
-        x_part_numbers = []
-        while x < width:
-            val = matrix[y][x]
-            if val in DIGITS:
-                if digit == '':
-                    start_x = x
-                digit += val
-            if val not in DIGITS or x == width - 1:
-                # Number has ended.
-                if digit:
-                    if has_adjacent_symbol(start_x, x, y):
-                        part_numbers.append(int(digit))
-                        x_part_numbers.append(int(digit))
-                    digit = ''
-            x += 1
-        print('%5d : %s' % (y, x_part_numbers))
-        y += 1
-
-    return sum(part_numbers)
-
-
-def solve2(input: Input) -> Optional[int]:
-    return None
+    stars = [symbol for symbol in input.symbols if symbol.is_star]
+    sum = 0
+    for star in stars:
+        adjacent_part_numbers = []
+        for part in input.part_numbers:
+            if max(0, part.start_x - 1) <= star.x <= min(part.end_x + 1, width - 1) and max(0, part.y - 1) <= star.y <= min(part.y + 1, height - 1):
+                adjacent_part_numbers.append(part.value)
+        if len(adjacent_part_numbers) == 2:
+            sum += adjacent_part_numbers[0] * adjacent_part_numbers[1]
+    return sum
 
 
 # ==== Solutions with test data ==== #
