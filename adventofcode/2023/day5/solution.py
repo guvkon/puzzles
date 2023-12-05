@@ -176,17 +176,13 @@ def map_vector(map: Transformer, vector: Vector) -> List[Vector]:
         end = curr.start - 1
         length = end - start + 1
         if length > 0:
-            _v = Vector(start, length)
-            print(f'Added in loop between {prev} and {curr} = {_v}')
-            output.append(_v)
+            output.append(Vector(start, length))
 
     last_idx = len(mapped_vector) - 1
     if mapped_vector[last_idx].end < vector.end:
         start = mapped_vector[last_idx].end + 1
         end = vector.end
-        _v = Vector(start, end - start + 1)
-        print(f'Added at the end {_v}')
-        output.append(_v)
+        output.append(Vector(start, end - start + 1))
 
     total_length = sum_vectors(output)
     if vector.length != total_length:
@@ -219,7 +215,6 @@ def solve2(input: Input) -> Optional[int]:
         left = input.seeds[s * 2]
         right = input.seeds[s * 2 + 1]
         seed = Vector(left, right)
-        print(f'Seed = {seed}')
         values = [seed]
         for map in input.maps:
             new_values = []
@@ -230,7 +225,6 @@ def solve2(input: Input) -> Optional[int]:
             values = new_values
         sorted_values = sort_vectors(values)
         value = sorted_values[0].start
-        print(f'Location candidates = {sorted_values}')
         if location is None or location > value:
             location = value
     return location
