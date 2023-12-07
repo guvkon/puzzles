@@ -96,17 +96,17 @@ def cards_combination(cards: str) -> CardCombination:
         d[c] = d.get(c, 0) + 1
     groups = sorted(list(d.values()), reverse=True)
 
-    if len(groups) == 1:
+    if groups == [5]:
         return CardCombination.five_of_a_kind
-    if len(groups) == 2:
-        if groups[0] == 4:
-            return CardCombination.four_of_a_kind
+    if groups == [4, 1]:
+        return CardCombination.four_of_a_kind
+    if groups == [3, 2]:
         return CardCombination.full_house
-    if len(groups) == 3:
-        if groups[0] == 3:
-            return CardCombination.three_of_a_kind
+    if groups == [3, 1, 1]:
+        return CardCombination.three_of_a_kind
+    if groups == [2, 2, 1]:
         return CardCombination.two_pair
-    if groups[0] == 2:
+    if groups == [2, 1, 1, 1]:
         return CardCombination.one_pair
     return CardCombination.high_card
 
