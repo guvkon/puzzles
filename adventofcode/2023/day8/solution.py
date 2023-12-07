@@ -100,7 +100,8 @@ def main():
             if slv == answer:
                 print(f'\nSolution {number} - Test has passed\n')
             else:
-                print(f'\nSolution {number} - Test has failed.\nCorrect: {answer}\nBut got: {slv}\n')
+                print(f'\nSolution {number} - Test has failed.')
+                print(f'Correct: {answer}\nBut got: {slv}\n')
                 continue
 
             slv = func(parse(input))
