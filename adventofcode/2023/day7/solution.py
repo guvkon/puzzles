@@ -33,7 +33,7 @@ def timer(f):
 # === Types === #
 
 
-class HandType(Enum):
+class CardCombination(Enum):
     five_of_a_kind = 7
     four_of_a_kind = 6
     full_house = 5
@@ -89,35 +89,43 @@ CARD_ORDER2 = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J']
 CARD_ORDER2.reverse()
 
 
-def hand_to_result(hand: Hand) -> HandType:
-    c = sorted(hand.cards)
-    if c[0] == c[1] == c[2] == c[3] == c[4]:
-        return HandType.five_of_a_kind
-    if (c[1] == c[2] == c[3]) and (c[0] == c[1] or c[4] == c[1]):
-        return HandType.four_of_a_kind
-    if ((c[0] == c[1] == c[2]) and (c[3] == c[4])) or ((c[2] == c[3] == c[4]) and (c[0] == c[1])):
-        return HandType.full_house
-    if (c[0] == c[1] == c[2]) or (c[2] == c[3] == c[4]) or (c[1] == c[2] == c[3]):
-        return HandType.three_of_a_kind
-    if (c[0] == c[1] and c[2] == c[3]) or (c[0] == c[1] and c[3] == c[4]) or (c[1] == c[2] and c[3] == c[4]):
-        return HandType.two_pair
-    if c[0] == c[1] or c[0] == c[2] or c[0] == c[3] or c[0] == c[4] or c[1] == c[2] or c[1] == c[3] or c[1] == c[4] or c[2] == c[3] or c[2] == c[4] or c[3] == c[4]:
-        return HandType.one_pair
-    return HandType.high_card
+@cache
+def cards_combination(cards: str) -> CardCombination:
+    d = {}
+    for c in cards:
+        d[c] = d.get(c, 0) + 1
+    groups = sorted(list(d.values()), reverse=True)
+
+    if len(groups) == 1:
+        return CardCombination.five_of_a_kind
+    if len(groups) == 2:
+        if groups[0] == 4:
+            return CardCombination.four_of_a_kind
+        return CardCombination.full_house
+    if len(groups) == 3:
+        if groups[0] == 3:
+            return CardCombination.three_of_a_kind
+        return CardCombination.two_pair
+    if groups[0] == 2:
+        return CardCombination.one_pair
+    return CardCombination.high_card
 
 
-def hand_to_result2(hand: Hand) -> HandType:
+def hand_combination(hand: Hand) -> CardCombination:
+    return cards_combination(hand.cards)
+
+
+def hand_combination_with_joker(hand: Hand) -> CardCombination:
     if 'J' not in hand.cards:
-        return hand_to_result(hand)
-    max_result = hand_to_result(hand)
-    for c in CARD_ORDER2:
+        return hand_combination(hand)
+    max_combination = hand_combination(hand)
+    for c in hand.cards:
         if c == 'J':
             continue
-        _hand = Hand(hand.cards.replace('J', c), hand.bid)
-        result = hand_to_result(_hand)
-        if result.value > max_result.value:
-            max_result = result
-    return max_result
+        result = cards_combination(hand.cards.replace('J', c))
+        if result.value > max_combination.value:
+            max_combination = result
+    return max_combination
 
 
 def compare(h1: Hand, h2: Hand, card_order: List[str], result) -> int:
@@ -136,11 +144,11 @@ def compare(h1: Hand, h2: Hand, card_order: List[str], result) -> int:
 
 
 def compare1(h1: Hand, h2: Hand) -> int:
-    return compare(h1, h2, CARD_ORDER1, hand_to_result)
+    return compare(h1, h2, CARD_ORDER1, hand_combination)
 
 
 def compare2(h1: Hand, h2: Hand) -> int:
-    return compare(h1, h2, CARD_ORDER1, hand_to_result2)
+    return compare(h1, h2, CARD_ORDER2, hand_combination_with_joker)
 
 
 def total_winnings(hands: List[Hand]) -> int:
