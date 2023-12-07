@@ -36,6 +36,10 @@ def timer(f):
 @dataclass
 class Input:
     lines: List[str]
+    times: List[int]
+    distances: List[int]
+    time: int
+    distance: int
 
 
 # === Input parsing === #
@@ -44,7 +48,17 @@ class Input:
 @timer
 def parse_input(data: str, options: dict) -> Input:
     lines = splitlines(data)
-    return Input(lines)
+
+    result = re.match(r'Time: +(.+)', lines[0])
+    times = [int(t) for t in result[1].split(' ') if t]
+
+    result = re.match(r'Distance: +(.+)', lines[1])
+    distances = [int(t) for t in result[1].split(' ') if t]
+
+    time = int(lines[0].replace('Time:', '').replace(' ', ''))
+    distance = int(lines[1].replace('Distance:', '').replace(' ', ''))
+
+    return Input(lines, times, distances, time, distance)
 
 
 def parse_input1(data: str) -> Input:
@@ -58,24 +72,42 @@ def parse_input2(data: str) -> Input:
 # === Solutions === #
 
 
+def find_winners(time: int, dist: int) -> List[Tuple[int, int]]:
+    winners = []
+    for t in range(0, time + 1):
+        remaining_t = time - t
+        d = remaining_t * t
+        if d > dist:
+            winners.append((t, d))
+    return winners
+
+
 @timer
 def solve1(input: Input) -> Optional[int]:
-    pass
+    answer = 1
+    for idx in range(0, len(input.times)):
+        time = input.times[idx]
+        dist = input.distances[idx]
+        winners = find_winners(time, dist)
+        answer *= len(winners)
+    return answer
 
 
 @timer
 def solve2(input: Input) -> Optional[int]:
-    pass
+    winners = find_winners(input.time, input.distance)
+    return len(winners)
 
 
 # ==== Solutions with test data ==== #
 
 
-test_data1 = """"""
-test_answer1 = 0
+test_data1 = """Time:      7  15   30
+Distance:  9  40  200"""
+test_answer1 = 288
 
 test_data2 = test_data1
-test_answer2 = 0
+test_answer2 = 71503
 
 solves = [
     {'func': solve1, 'parse': parse_input1,
