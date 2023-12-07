@@ -81,12 +81,12 @@ def parse_input2(data: str) -> Input:
 # === Solutions === #
 
 
-CARD_ORDER1 = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
-CARD_ORDER1.reverse()
+CARD_ORDER = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
+CARD_ORDER.reverse()
 
 
-CARD_ORDER2 = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J']
-CARD_ORDER2.reverse()
+CARD_ORDER_WITH_JOKER = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J']
+CARD_ORDER_WITH_JOKER.reverse()
 
 
 @cache
@@ -118,7 +118,7 @@ def hand_combination(hand: Hand) -> CardCombination:
 def hand_combination_with_joker(hand: Hand) -> CardCombination:
     if 'J' not in hand.cards:
         return hand_combination(hand)
-    max_combination = hand_combination(hand)
+    max_combination = cards_combination(hand.cards)
     for c in hand.cards:
         if c == 'J':
             continue
@@ -128,7 +128,7 @@ def hand_combination_with_joker(hand: Hand) -> CardCombination:
     return max_combination
 
 
-def compare(h1: Hand, h2: Hand, card_order: List[str], result) -> int:
+def generic_compare(h1: Hand, h2: Hand, card_order: List[str], result) -> int:
     r1 = result(h1)
     r2 = result(h2)
     if r1.value != r2.value:
@@ -143,12 +143,12 @@ def compare(h1: Hand, h2: Hand, card_order: List[str], result) -> int:
     return 0
 
 
-def compare1(h1: Hand, h2: Hand) -> int:
-    return compare(h1, h2, CARD_ORDER1, hand_combination)
+def compare(h1: Hand, h2: Hand) -> int:
+    return generic_compare(h1, h2, CARD_ORDER, hand_combination)
 
 
-def compare2(h1: Hand, h2: Hand) -> int:
-    return compare(h1, h2, CARD_ORDER2, hand_combination_with_joker)
+def compare_with_joker(h1: Hand, h2: Hand) -> int:
+    return generic_compare(h1, h2, CARD_ORDER_WITH_JOKER, hand_combination_with_joker)
 
 
 def total_winnings(hands: List[Hand]) -> int:
@@ -160,12 +160,12 @@ def total_winnings(hands: List[Hand]) -> int:
 
 @timer
 def solve1(input: Input) -> Optional[int]:
-    return total_winnings(sorted(input.hands, key=cmp_to_key(compare1)))
+    return total_winnings(sorted(input.hands, key=cmp_to_key(compare)))
 
 
 @timer
 def solve2(input: Input) -> Optional[int]:
-    return total_winnings(sorted(input.hands, key=cmp_to_key(compare2)))
+    return total_winnings(sorted(input.hands, key=cmp_to_key(compare_with_joker)))
 
 
 # ==== Solutions with test data ==== #
@@ -194,9 +194,12 @@ solves = [
 
 @timer
 def main():
+    start = time_ns()
     filename = 'input.txt'
     with open(filename, 'r') as f:
         input = f.read()
+        delta = (time_ns() - start) / 1000000.0
+        print(f'Elapsed time of reading file: {delta} ms')
 
         number = 1
         for solve in solves:
@@ -206,16 +209,22 @@ def main():
             slv = func(parse(solve['test_data']))
             answer = solve['test_answer']
             if slv == answer:
+                print()
                 print(f'Solution {number} - Test has passed')
+                print()
             else:
+                print()
                 print(
                     f'Solution {number} - Test has failed. Should be:\n{answer}\nGot:\n{slv}')
+                print()
                 number += 1
                 continue
 
             slv = func(parse(input))
             if slv is not None:
-                print(f'Solution {number} - The answer:\n{slv}')
+                print()
+                print(f'Solution {number} - The answer is {slv}')
+                print()
             number += 1
 
 
