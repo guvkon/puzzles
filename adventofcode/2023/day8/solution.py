@@ -34,8 +34,16 @@ def timer(f):
 
 
 @dataclass
+class A:
+    pass
+
+
+@dataclass
 class Input:
     lines: List[str]
+    instructions: str
+    map: Dict[str, Tuple[str, str]]
+    starting_locations: List[str]
 
 
 # === Input parsing === #
@@ -44,8 +52,16 @@ class Input:
 @timer
 def parse_input(data: str, options: dict) -> Input:
     lines = splitlines(data)
+    map = {}
+    starting_locations = []
+    for idx in range(1, len(lines)):
+        line = lines[idx]
+        result = re.match(r'(\w+) = \((\w+), (\w+)\)', line)
+        map[result[1]] = (result[2], result[3])
+        if result[1][2] == 'A':
+            starting_locations.append(result[1])
 
-    return Input(lines)
+    return Input(lines, lines[0], map, starting_locations)
 
 
 def parse_input_1(data: str) -> Input:
@@ -59,24 +75,78 @@ def parse_input_2(data: str) -> Input:
 # === Solutions === #
 
 
+instruction_map = {'L': 0, 'R': 1}
+
+
 @timer
 def solve_1(input: Input) -> Optional[int]:
-    pass
+    idx = 0
+    location = 'AAA'
+    map = input.map
+    steps = 0
+    while location != 'ZZZ':
+        instruction = instruction_map[input.instructions[idx]]
+        location = map[location][instruction]
+        idx += 1
+        steps += 1
+        if idx == len(input.instructions):
+            idx = 0
+    return steps
+
+
+def is_end(locations: List[str]) -> bool:
+    for loc in locations:
+        if loc[2] != 'Z':
+            return False
+    return True
 
 
 @timer
 def solve_2(input: Input) -> Optional[int]:
-    pass
+    idx = 0
+    steps = 0
+    map = input.map
+    instructs = input.instructions
+    locations = input.starting_locations
+    while not is_end(locations):
+        instruction = instruction_map[instructs[idx]]
+        for i, loc in enumerate(locations):
+            locations[i] = map[loc][instruction]
+        idx += 1
+        steps += 1
+        if idx == len(instructs):
+            idx = 0
+        if steps % 1e6 == 0:
+            print(f'Steps = {steps}')
+            print(locations)
+    return steps
 
 
 # ==== Solutions with test data ==== #
 
 
-test_data_1 = """"""
-test_answer_1 = 1
+test_data_1 = """RL
 
-test_data_2 = test_data_1
-test_answer_2 = 2
+AAA = (BBB, CCC)
+BBB = (DDD, EEE)
+CCC = (ZZZ, GGG)
+DDD = (DDD, DDD)
+EEE = (EEE, EEE)
+GGG = (GGG, GGG)
+ZZZ = (ZZZ, ZZZ)"""
+test_answer_1 = 2
+
+test_data_2 = """LR
+
+11A = (11B, XXX)
+11B = (XXX, 11Z)
+11Z = (11B, XXX)
+22A = (22B, XXX)
+22B = (22C, 22C)
+22C = (22Z, 22Z)
+22Z = (22B, 22B)
+XXX = (XXX, XXX)"""
+test_answer_2 = 6
 
 
 # ==== Template for running solutions ==== #
