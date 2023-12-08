@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-import numpy as np
+import numpy
+import math
 import re
 import sys
 from dataclasses import dataclass
@@ -34,8 +35,9 @@ def timer(f):
 
 
 @dataclass
-class A:
-    pass
+class Loop:
+    locations: List[str]
+    done: bool
 
 
 @dataclass
@@ -103,23 +105,44 @@ def is_end(locations: List[str]) -> bool:
 
 @timer
 def solve_2(input: Input) -> Optional[int]:
-    idx = 0
-    steps = 0
     map = input.map
     instructs = input.instructions
-    locations = input.starting_locations
+    starts = input.starting_locations
+
+    idx = 0
+    steps = 0
+    locations = starts
+    loops = [Loop([loc], False) for loc in starts]
     while not is_end(locations):
+        # Do step.
         instruction = instruction_map[instructs[idx]]
         for i, loc in enumerate(locations):
             locations[i] = map[loc][instruction]
-        idx += 1
         steps += 1
+
+        # Move pointer.
+        idx += 1
         if idx == len(instructs):
             idx = 0
-        if steps % 1e6 == 0:
-            print(f'Steps = {steps}')
-            print(locations)
-    return steps
+
+        # Update loops.
+        finished_loops = 0
+        for i in range(0, len(loops)):
+            loop = loops[i]
+            if loop.done:
+                finished_loops += 1
+                continue
+            loop.locations.append(locations[i])
+            if locations[i][2] == 'Z':
+                loop.done = True
+
+        # Check if we're done.
+        if finished_loops == len(locations):
+            break
+
+    loop_steps = [len(loop.locations) - 1 for loop in loops]
+
+    return numpy.lcm.reduce(loop_steps)
 
 
 # ==== Solutions with test data ==== #
