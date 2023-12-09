@@ -37,6 +37,7 @@ def timer(f):
 @dataclass
 class Input:
     lines: List[str]
+    values: List[List[int]]
 
 
 # === Input parsing === #
@@ -45,8 +46,8 @@ class Input:
 @timer
 def parse_input(data: str, options: dict) -> Input:
     lines = splitlines(data)
-
-    return Input(lines)
+    values = [[int(v) for v in line.split(' ')] for line in lines]
+    return Input(lines, values)
 
 
 def parse_input_1(data: str) -> Input:
@@ -60,24 +61,61 @@ def parse_input_2(data: str) -> Input:
 # === Solutions === #
 
 
+memoize = {}
+
+
+def next_value(seq: List[int]) -> int:
+    key = ' '.join([str(s) for s in seq])
+    if key in memoize:
+        return memoize[key]
+
+    all_zeroes = True
+    for val in seq:
+        if val != 0:
+            all_zeroes = False
+            break
+    if all_zeroes:
+        memoize[key] = 0
+        return 0
+
+    diffs = []
+    last_idx = len(seq) - 1
+    for idx in range(0, last_idx):
+        diffs.append(seq[idx + 1] - seq[idx])
+    answer = seq[last_idx] + next_value(diffs)
+    memoize[key] = answer
+    return answer
+
+
 @timer
 def solve_1(input: Input) -> Optional[int]:
-    return
+    values = input.values
+    sum = 0
+    for seq in values:
+        sum += next_value(seq)
+    return sum
 
 
 @timer
 def solve_2(input: Input) -> Optional[int]:
-    return
+    values = input.values
+    sum = 0
+    for seq in values:
+        seq.reverse()
+        sum += next_value(seq)
+    return sum
 
 
 # ==== Solutions with test data ==== #
 
 
-test_data_1 = """"""
-test_answer_1 = 0
+test_data_1 = """0 3 6 9 12 15
+1 3 6 10 15 21
+10 13 16 21 30 45"""
+test_answer_1 = 114
 
 test_data_2 = test_data_1
-test_answer_2 = 0
+test_answer_2 = 2
 
 
 # ==== Template for running solutions ==== #
