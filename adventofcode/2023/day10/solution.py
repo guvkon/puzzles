@@ -162,11 +162,9 @@ def generate_starting_loops(start: Node, connected_nodes: List[Node]) -> List[Li
         yield [Node(NodeType.bottom_right, x, y), right]
 
 
-@timer
-def solve_1(input: Input) -> Optional[int]:
-    start = input.start
-    edges = input.edges
-    max_loop = 0
+def find_main_loop(start: Node, edges: Dict[Tuple[int, int], List[Node]]) -> List[Node]:
+    max_loop_len = 0
+    max_loop = []
     for loop in generate_starting_loops(start, edges[start.pos]):
         finished = False
         while True:
@@ -185,14 +183,22 @@ def solve_1(input: Input) -> Optional[int]:
 
         if not finished:
             continue
-        if max_loop < len(loop):
-            max_loop = len(loop)
+        if max_loop_len < len(loop):
+            max_loop_len = len(loop)
+            max_loop = loop
+    return max_loop
 
-    return max_loop // 2
+
+@timer
+def solve_1(input: Input) -> Optional[int]:
+    return len(find_main_loop(input.start, input.edges)) // 2
 
 
 @timer
 def solve_2(input: Input) -> Optional[int]:
+    main_loop = find_main_loop(input.start, input.edges)
+    dots = [node for node in input.nodes.values() if node.type == NodeType.ground]
+    print(dots)
     return
 
 
@@ -207,8 +213,17 @@ LJ...
 """
 test_answer_1 = 8
 
-test_data_2 = test_data_1
-test_answer_2 = 0
+test_data_2 = """.F----7F7F7F7F-7....
+.|F--7||||||||FJ....
+.||.FJ||||||||L7....
+FJL7L7LJLJ||LJ.L-7..
+L--J.L7...LJS7F-7L7.
+....F-J..F7FJ|L7L7L7
+....L7.F7||L7|.L7L7|
+.....|FJLJ|FJ|F7|.LJ
+....FJL-7.||.||||...
+....L---J.LJ.LJLJ..."""
+test_answer_2 = 8
 
 
 # ==== Template for running solutions ==== #
