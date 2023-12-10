@@ -7,7 +7,7 @@ import sys
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional, Tuple, Union, Dict, Set, Callable
-from time import time_ns
+from time import time_ns, sleep
 from functools import wraps, cache, cached_property, cmp_to_key
 from copy import copy
 
@@ -56,7 +56,7 @@ class Node:
         self.y = y
 
     def __repr__(self):
-        return f'{self.type} ({self.x}, {self.y})'
+        return f'{self.type.value} ({self.x}, {self.y})'
 
     @property
     def pos(self) -> Tuple[int, int]:
@@ -139,7 +139,7 @@ def parse_input_2(data: str) -> Input:
 # === Solutions === #
 
 
-def generate_starts(start: Node, connected_nodes: List[Node]) -> List[Node]:
+def generate_starting_loops(start: Node, connected_nodes: List[Node]) -> List[List[Node]]:
     edges = {}
     for node in connected_nodes:
         edges[node.pos] = node
@@ -149,26 +149,46 @@ def generate_starts(start: Node, connected_nodes: List[Node]) -> List[Node]:
     top = edges.get((x, y - 1))
     bottom = edges.get((x, y + 1))
     if top and bottom:
-        yield Node(NodeType.top_bottom, x, y)
+        yield [Node(NodeType.top_bottom, x, y), top]
     if top and left:
-        yield Node(NodeType.top_left, x, y)
+        yield [Node(NodeType.top_left, x, y), top]
     if top and bottom:
-        yield Node(NodeType.top_bottom, x, y)
+        yield [Node(NodeType.top_bottom, x, y), top]
     if left and bottom:
-        yield Node(NodeType.bottom_left, x, y)
+        yield [Node(NodeType.bottom_left, x, y), bottom]
     if left and right:
-        yield Node(NodeType.left_right, x, y)
+        yield [Node(NodeType.left_right, x, y), right]
     if bottom and right:
-        yield Node(NodeType.bottom_right, x, y)
+        yield [Node(NodeType.bottom_right, x, y), right]
 
 
 @timer
 def solve_1(input: Input) -> Optional[int]:
-    nodes = input.nodes
+    start = input.start
     edges = input.edges
-    for start in generate_starts(input.start, edges[input.start.pos]):
-        print(start)
-    return
+    max_loop = 0
+    for loop in generate_starting_loops(start, edges[start.pos]):
+        finished = False
+        while True:
+            curr = len(loop) - 1
+            curr_node = loop[curr]
+            prev_node = loop[curr - 1]
+            if len(edges[curr_node.pos]) != 2:
+                break
+            for node in edges[curr_node.pos]:
+                if node.pos != prev_node.pos:
+                    loop.append(node)
+            if loop[len(loop) - 1].pos == start.pos:
+                finished = True
+                loop.pop()
+                break
+
+        if not finished:
+            continue
+        if max_loop < len(loop):
+            max_loop = len(loop)
+
+    return max_loop // 2
 
 
 @timer
