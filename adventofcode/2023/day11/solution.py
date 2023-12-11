@@ -38,15 +38,37 @@ def timer(f):
 class Input:
     data: str
     lines: List[str]
+    expanded: List[str]
 
 
 # === Input parsing === #
 
 
+def is_dots(lines: List[str], x: int) -> bool:
+    for y in range(0, len(lines)):
+        if lines[y][x] != '.':
+            return False
+    return True
+
+
 @timer
 def parse_input(data: str, options: dict) -> Input:
     lines = splitlines(data)
-    return Input(data, lines)
+
+    # Expand Universe.
+    expanded = []
+    empty_line = '.' * len(lines[0])
+    for line in lines:
+        expanded.append(line)
+        if line == empty_line:
+            expanded.append(line)
+    for x in range(len(lines[0]) - 1, -1, -1):
+        if not is_dots(lines, x):
+            continue
+        for y in range(0, len(expanded)):
+            expanded[y] = expanded[y][0:x] + '.' + expanded[y][x:]
+
+    return Input(data, lines, expanded)
 
 
 def parse_input_1(data: str) -> Input:
@@ -73,8 +95,18 @@ def solve_2(input: Input) -> Optional[int]:
 # ==== Solutions with test data ==== #
 
 
-test_data_1 = """"""
-test_answer_1 = 0
+test_data_1 = """...#......
+.......#..
+#.........
+..........
+......#...
+.#........
+.........#
+..........
+.......#..
+#...#.....
+"""
+test_answer_1 = 374
 
 test_data_2 = test_data_1
 test_answer_2 = 0
