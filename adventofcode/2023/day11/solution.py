@@ -39,6 +39,7 @@ class Input:
     data: str
     lines: List[str]
     expanded: List[str]
+    galaxies: List[Tuple[int, int]]
 
 
 # === Input parsing === #
@@ -68,7 +69,15 @@ def parse_input(data: str, options: dict) -> Input:
         for y in range(0, len(expanded)):
             expanded[y] = expanded[y][0:x] + '.' + expanded[y][x:]
 
-    return Input(data, lines, expanded)
+    # Find galaxies.
+    galaxies = []
+    for y in range(0, len(expanded)):
+        line = expanded[y]
+        for x in range(0, len(line)):
+            if line[x] == '#':
+                galaxies.append((x, y))
+
+    return Input(data, lines, expanded, galaxies)
 
 
 def parse_input_1(data: str) -> Input:
@@ -84,7 +93,14 @@ def parse_input_2(data: str) -> Input:
 
 @timer
 def solve_1(input: Input) -> Optional[int]:
-    return
+    distances = []
+    galaxies = input.galaxies
+    for main_idx in range(0, len(galaxies)):
+        for pair_idx in range(main_idx + 1, len(galaxies)):
+            xa, ya = galaxies[main_idx]
+            xb, yb = galaxies[pair_idx]
+            distances.append(abs(xa - xb) + abs(ya - yb))
+    return sum(distances)
 
 
 @timer
