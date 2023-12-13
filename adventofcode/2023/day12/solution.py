@@ -141,11 +141,15 @@ def count_arrangements(row: Row) -> int:
         before = ''.join(left_regex)
         remaining = ''.join([patterns[idx].left for idx in range(index + 1, len(patterns))])
         _left_regex = f'{before}({pattern.left}){remaining}'
-        left_match = re.match(_left_regex, row.springs)
+        print(f'Actual regex = {_left_regex}')
+        left_match = re.search(_left_regex, row.springs)
+        if not left_match:
+            return 0
         left = left_match.start(group + 1)
         vary_start = len(left_match.group(group))
         _right_regex = before + pattern.right + remaining
-        right = re.match(_right_regex, row.springs).start(group)
+        right_match = re.search(_right_regex, row.springs)
+        right = right_match.start(group)
         print(f'Left = {left}, right = {right}, vary_start = {vary_start}')
 
         if left == right:
