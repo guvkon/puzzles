@@ -69,51 +69,59 @@ def parse_input_2(data: str) -> Input:
 # === Solutions === #
 
 
-def find_horizontal_reflection(lines: List[str]) -> int:
+def find_horizontal_reflection(lines: List[str], smudges: int = 0) -> int:
+    cols = len(lines[0])
     rows = len(lines)
     for row in range(1, rows):
         height = min(row, rows - row)
-        mirror = True
+        wrongs = 0
         for right_y in range(row, row + height):
             left_y = row - (right_y - row) - 1
-            if lines[right_y] != lines[left_y]:
-                mirror = False
-                break
-        if mirror:
+            for x in range(0, cols):
+                if lines[right_y][x] != lines[left_y][x]:
+                    wrongs += 1
+                    if wrongs > smudges:
+                        break
+        if wrongs == smudges:
             return row
     return 0
 
 
-def find_vertical_reflection(lines: List[str]) -> int:
+def find_vertical_reflection(lines: List[str], smudges: int = 0) -> int:
     cols = len(lines[0])
     rows = len(lines)
     for col in range(1, cols):
         width = min(col, cols - col)
-        mirror = True
+        wrongs = 0
         for right_x in range(col, col + width):
             left_x = col - (right_x - col) - 1
             for y in range(0, rows):
                 if lines[y][right_x] != lines[y][left_x]:
-                    mirror = False
-                    break
-        if mirror:
+                    wrongs += 1
+                    if wrongs > smudges:
+                        break
+        if wrongs == smudges:
             return col
     return 0
 
 
-@timer
-def solve_1(input: Input) -> Optional[int]:
+def solution(input: Input, smudges: int) -> int:
     sum = 0
     for pattern in input.patterns:
-        rows = find_horizontal_reflection(pattern)
-        cols = find_vertical_reflection(pattern)
+        rows = find_horizontal_reflection(pattern, smudges)
+        cols = find_vertical_reflection(pattern, smudges)
         sum += rows * 100 + cols
     return sum
 
 
 @timer
+def solve_1(input: Input) -> Optional[int]:
+    return solution(input, 0)
+
+
+@timer
 def solve_2(input: Input) -> Optional[int]:
-    return
+    return solution(input, 1)
 
 
 # ==== Solutions with test data ==== #
@@ -137,7 +145,7 @@ test_data_1 = """#.##..##.
 test_answer_1 = 405
 
 test_data_2 = test_data_1
-test_answer_2 = 0
+test_answer_2 = 400
 
 
 # ==== Template for running solutions ==== #
