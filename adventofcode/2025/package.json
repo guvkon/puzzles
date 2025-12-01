@@ -1,0 +1,10 @@
+{
+  "name": "adventofcode-2025",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
