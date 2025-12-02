@@ -1,3 +1,5 @@
+import { generateMain, getInputStrings } from "./framework";
+
 // Types.
 type Rotation = {
     direction: 'L' | 'R';
@@ -8,7 +10,7 @@ type Input = Rotation[];
 
 
 // Parse input.
-const parseInput = (input: string): Rotation[] =>
+const parseInput = (input: string): Input =>
     input.split('\n').map((line) => {
         const match = /^([RL])(\d+)$/gm.exec(line);
         if (!match) return null;
@@ -77,41 +79,6 @@ const solve2 = (input: Input): number => {
     return count;
 };
 
+
 // Main.
-const main = (input: string, sampleInput: string, sampleAnswer1: number, sampleAnswer2: number) => {
-    // Parse inputs.
-    const parsedSampleInput = parseInput(sampleInput);
-    const parsedInput = parseInput(input);
-
-    // Answers
-    let answer: number;
-
-    // Part 1.
-    answer = solve1(parsedSampleInput);
-    if (answer !== sampleAnswer1) {
-        console.error(`Wrong sample answer for part 1! Got: ${answer}, correct: ${sampleAnswer1}`);
-        return;
-    }
-
-    answer = solve1(parsedInput);
-    console.log(`Answer for part 1: ${answer}`);
-
-    // Part 2.
-    answer = solve2(parsedSampleInput);
-    if (answer !== sampleAnswer2) {
-        console.error(`Wrong sample answer for part 2! Got: ${answer}, correct: ${sampleAnswer2}`);
-        return;
-    }
-
-    answer = solve2(parsedInput);
-    console.log(`Answer for part 2: ${answer}`);
-};
-
-
-// Execute main.
-main(
-    await Bun.file("input/day1.txt").text(),
-    await Bun.file("input/day1_sample.txt").text(),
-    3,
-    6
-);
+generateMain(parseInput, solve1, solve2)(...await getInputStrings(1), 3, 6);
