@@ -1,5 +1,10 @@
 import { generateMain, getInputStrings } from "./framework";
 
+// Puzzle config.
+const DAY = 1;
+const SAMPLE_ANSWER_1 = 3;
+const SAMPLE_ANSWER_2 = 6;
+
 // Types.
 type Rotation = {
     direction: 'L' | 'R';
@@ -22,7 +27,7 @@ const parseInput = (input: string): Input =>
     }).filter((value: Rotation | null): value is Rotation => value !== null)
 
 
-// Solve 1.
+// Solve.
 const solve1 = (input: Input): number => {
     let count = 0;
     let current = 50;
@@ -44,8 +49,6 @@ const solve1 = (input: Input): number => {
     return count;
 };
 
-
-// Solve 1.
 const solve2 = (input: Input): number => {
     let count = 0;
     let current = 50;
@@ -81,4 +84,4 @@ const solve2 = (input: Input): number => {
 
 
 // Main.
-generateMain(parseInput, solve1, solve2)(...await getInputStrings(1), 3, 6);
+generateMain(parseInput, solve1, solve2)(...await getInputStrings(DAY), SAMPLE_ANSWER_1, SAMPLE_ANSWER_2);
