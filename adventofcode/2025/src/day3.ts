@@ -22,33 +22,43 @@ const solve1 = (input: Input): number => {
 };
 
 const solve2 = (input: Input): number => {
-    return solve(input);
+    return input.reduce((prev, curr) => prev + findMaxJoltageOfBatteryBank(curr, 12), 0);
 };
 
 const solve = (input: Input) => {
-    return input.reduce((prev, curr) => prev + findMaxJoltageOfBatteryBank1(curr), 0);
+    return input.reduce((prev, curr) => prev + findMaxJoltageOfBatteryBank(curr, 2), 0);
 }
 
-function findMaxJoltageOfBatteryBank1(bank: BatteryBank): number {
+function findMaxJoltageOfBatteryBank(bank: BatteryBank, length: number): number {
     if (!bank.length) {
         return 0;
     }
 
-    if (bank.length < 3) {
+    if (bank.length <= length) {
         return Number(bank.join(''));
     }
 
-    let max = 0;
-    for (let i = 0; i < bank.length - 1; i++) {
-        for (let j = i + 1; j < bank.length; j++) {
-            const joltage = Number([bank[i], bank[j]].join(''));
-            if (joltage > max) {
-                max = joltage;
-            }
-        }
+    return Number(findSequence(bank, length, []).join(''));
+}
+
+function findSequence(bank: BatteryBank, length: number, sequence: BatteryBank): BatteryBank {
+    if (sequence.length >= length) {
+        return sequence;
     }
 
-    return max;
+    const remainingLength = length - sequence.length;
+
+    const order = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
+    for (const digit of order) {
+        const index = bank.indexOf(digit);
+        if (index === -1 || index + remainingLength > bank.length) {
+            continue;
+        }
+
+        return findSequence(bank.slice(index + 1), length, [...sequence, digit]);
+    }
+
+    throw new Error('Cannot find any digit?!');
 }
 
 
