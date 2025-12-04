@@ -2,9 +2,14 @@
   "name": "adventofcode-2025",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "prettier": "3.7.4"
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "scripts": {
+    "prettier": "prettier src/ --check",
+    "prettier:fix": "prettier src/ --write"
   }
 }
