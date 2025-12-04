@@ -1,4 +1,4 @@
-import { generateMain, getInputStrings } from "./framework";
+import { generateMain, getInputStrings } from './framework';
 
 // Puzzle config.
 const DAY = 3;
@@ -10,11 +10,8 @@ type BatteryBank = number[];
 
 type Input = BatteryBank[];
 
-
 // Parse input.
-const parseInput = (input: string): Input =>
-    input.split('\n').map((line) => line.split('').map(Number));
-
+const parseInput = (input: string): Input => input.split('\n').map((line) => line.split('').map(Number));
 
 // Solve.
 const solve1 = (input: Input): number => {
@@ -56,7 +53,6 @@ function findSequence(bank: BatteryBank, length: number, sequence: BatteryBank):
 
     throw new Error('Cannot find any digit?!');
 }
-
 
 // Main.
 generateMain(parseInput, solve1, solve2)(...(await getInputStrings(DAY)), SAMPLE_ANSWER_1, SAMPLE_ANSWER_2);

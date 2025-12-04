@@ -29,12 +29,7 @@ export function generateMain<Input>(parseInput: ParseInput<Input>, solve1: Solve
 }
 
 export async function getInputStrings(day: number): Promise<[string, string]> {
-    const inputs = (await Promise.allSettled([
-        await Bun.file(`input/day${day}.txt`).text(),
-        await Bun.file(`input/day${day}_sample.txt`).text()
-    ]))
-        .filter((promise) => promise.status === 'fulfilled')
-        .map((promise) => promise.value);
+    const inputs = (await Promise.allSettled([await Bun.file(`input/day${day}.txt`).text(), await Bun.file(`input/day${day}_sample.txt`).text()])).filter((promise) => promise.status === 'fulfilled').map((promise) => promise.value);
 
     return inputs as [string, string];
 }

@@ -1,4 +1,4 @@
-import { generateMain, getInputStrings } from "./framework";
+import { generateMain, getInputStrings } from './framework';
 
 // Puzzle config.
 const DAY = 4;
@@ -16,23 +16,21 @@ type Grid = {
 
 type Input = Grid;
 
-
 // Parse input.
 const parseInput = (input: string): Input => {
     const cells = input.split('\n').map((line) => line.split('').map((cell) => cell as Cell));
     if (!cells.length || !cells[0]?.length) throw new Error('Unexpected input');
 
-    const getCell = (x: number, y: number) => cells[y] ? (cells[y][x] ?? '.') : '.';
+    const getCell = (x: number, y: number) => (cells[y] ? (cells[y][x] ?? '.') : '.');
     const removeRoll = (x: number, y: number) => {
         if (!cells[y] || !cells[y][x]) return;
         cells[y][x] = '.';
-    }
+    };
     const height = cells.length;
     const width = cells[0].length;
 
-    return { height, width, getCell, removeRoll }
-}
-
+    return { height, width, getCell, removeRoll };
+};
 
 // Solve.
 const solve1 = (input: Input): number => {
@@ -77,8 +75,7 @@ const countRolls = ({ getCell, height, removeRoll, width }: Input, withDeletion:
     }
 
     return initialCount === count ? count : countRolls({ getCell, height, removeRoll, width }, withDeletion, count);
-}
-
+};
 
 // Main.
 generateMain(parseInput, solve1, solve2)(...(await getInputStrings(DAY)), SAMPLE_ANSWER_1, SAMPLE_ANSWER_2);

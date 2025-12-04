@@ -1,4 +1,4 @@
-import { generateMain, getInputStrings } from "./framework";
+import { generateMain, getInputStrings } from './framework';
 
 // Puzzle config.
 const DAY = 1;
@@ -9,23 +9,24 @@ const SAMPLE_ANSWER_2 = 6;
 type Rotation = {
     direction: 'L' | 'R';
     number: number;
-}
+};
 
 type Input = Rotation[];
 
-
 // Parse input.
 const parseInput = (input: string): Input =>
-    input.split('\n').map((line) => {
-        const match = /^([RL])(\d+)$/gm.exec(line);
-        if (!match) return null;
+    input
+        .split('\n')
+        .map((line) => {
+            const match = /^([RL])(\d+)$/gm.exec(line);
+            if (!match) return null;
 
-        return {
-            direction: match[1],
-            number: Number(match[2]),
-        } as Rotation;
-    }).filter((value: Rotation | null): value is Rotation => value !== null)
-
+            return {
+                direction: match[1],
+                number: Number(match[2]),
+            } as Rotation;
+        })
+        .filter((value: Rotation | null): value is Rotation => value !== null);
 
 // Solve.
 const solve1 = (input: Input): number => {
@@ -44,7 +45,7 @@ const solve1 = (input: Input): number => {
         if (current === 0) {
             count += 1;
         }
-    })
+    });
 
     return count;
 };
@@ -77,11 +78,10 @@ const solve2 = (input: Input): number => {
         }
 
         previous = current;
-    })
+    });
 
     return count;
 };
 
-
 // Main.
-generateMain(parseInput, solve1, solve2)(...await getInputStrings(DAY), SAMPLE_ANSWER_1, SAMPLE_ANSWER_2);
+generateMain(parseInput, solve1, solve2)(...(await getInputStrings(DAY)), SAMPLE_ANSWER_1, SAMPLE_ANSWER_2);

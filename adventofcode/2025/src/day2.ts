@@ -1,4 +1,4 @@
-import { generateMain, getInputStrings } from "./framework";
+import { generateMain, getInputStrings } from './framework';
 
 // Puzzle config.
 const DAY = 2;
@@ -10,16 +10,17 @@ type Range = [number, number];
 
 type Input = Range[];
 
-
 // Parse input.
 const parseInput = (input: string): Input =>
-    input.split(',').map((line) => {
-        const match = /^(\d+)-(\d+)$/gm.exec(line);
-        if (!match) return null;
+    input
+        .split(',')
+        .map((line) => {
+            const match = /^(\d+)-(\d+)$/gm.exec(line);
+            if (!match) return null;
 
-        return [Number(match[1]), Number(match[2])] as Range;
-    }).filter((value: Range | null): value is Range => value !== null)
-
+            return [Number(match[1]), Number(match[2])] as Range;
+        })
+        .filter((value: Range | null): value is Range => value !== null);
 
 // Solve.
 const solve1 = (input: Input): number => {
@@ -39,10 +40,10 @@ const solve = (isSilly: (id: number) => boolean, input: Input) => {
                 sum += id;
             }
         }
-    })
+    });
 
     return sum;
-}
+};
 
 function isSilly1(id: number): boolean {
     const _id = String(id);
@@ -75,7 +76,6 @@ function isSilly2(id: number): boolean {
 
     return false;
 }
-
 
 // Main.
 generateMain(parseInput, solve1, solve2)(...(await getInputStrings(DAY)), SAMPLE_ANSWER_1, SAMPLE_ANSWER_2);
