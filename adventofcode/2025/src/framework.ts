@@ -3,31 +3,27 @@ type Solve<Input> = (input: Input) => number;
 
 export function generateMain<Input>(parseInput: ParseInput<Input>, solve1: Solve<Input>, solve2: Solve<Input>) {
     return (input: string, sampleInput: string, sampleAnswer1: number, sampleAnswer2: number) => {
-        // Parse inputs.
-        const parsedSampleInput = parseInput(sampleInput);
-        const parsedInput = parseInput(input);
-
         // Answers
         let answer: number;
 
         // Part 1.
-        answer = solve1(parsedSampleInput);
+        answer = solve1(parseInput(sampleInput));
         if (answer !== sampleAnswer1) {
             console.error(`Wrong sample answer for part 1! Got: ${answer}, correct: ${sampleAnswer1}`);
             return;
         }
 
-        answer = solve1(parsedInput);
+        answer = solve1(parseInput(input));
         console.log(`Answer for part 1: ${answer}`);
 
         // Part 2.
-        answer = solve2(parsedSampleInput);
+        answer = solve2(parseInput(sampleInput));
         if (answer !== sampleAnswer2) {
             console.error(`Wrong sample answer for part 2! Got: ${answer}, correct: ${sampleAnswer2}`);
             return;
         }
 
-        answer = solve2(parsedInput);
+        answer = solve2(parseInput(input));
         console.log(`Answer for part 2: ${answer}`);
     };
 }

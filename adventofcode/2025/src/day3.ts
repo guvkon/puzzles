@@ -18,16 +18,12 @@ const parseInput = (input: string): Input =>
 
 // Solve.
 const solve1 = (input: Input): number => {
-    return solve(input);
+    return input.reduce((prev, curr) => prev + findMaxJoltageOfBatteryBank(curr, 2), 0);
 };
 
 const solve2 = (input: Input): number => {
     return input.reduce((prev, curr) => prev + findMaxJoltageOfBatteryBank(curr, 12), 0);
 };
-
-const solve = (input: Input) => {
-    return input.reduce((prev, curr) => prev + findMaxJoltageOfBatteryBank(curr, 2), 0);
-}
 
 function findMaxJoltageOfBatteryBank(bank: BatteryBank, length: number): number {
     if (!bank.length) {
