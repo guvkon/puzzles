@@ -84,4 +84,8 @@ const solve2 = (input: Input): number => {
 };
 
 // Main.
-generateMain(parseInput, solve1, solve2)(...(await getInputStrings(DAY)), SAMPLE_ANSWER_1, SAMPLE_ANSWER_2);
+generateMain(parseInput, solve1, solve2)(
+    ...(await getInputStrings(DAY)),
+    SAMPLE_ANSWER_1,
+    SAMPLE_ANSWER_2
+);

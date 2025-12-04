@@ -11,7 +11,8 @@ type BatteryBank = number[];
 type Input = BatteryBank[];
 
 // Parse input.
-const parseInput = (input: string): Input => input.split('\n').map((line) => line.split('').map(Number));
+const parseInput = (input: string): Input =>
+    input.split('\n').map((line) => line.split('').map(Number));
 
 // Solve.
 const solve1 = (input: Input): number => {
@@ -55,4 +56,8 @@ function findSequence(bank: BatteryBank, length: number, sequence: BatteryBank):
 }
 
 // Main.
-generateMain(parseInput, solve1, solve2)(...(await getInputStrings(DAY)), SAMPLE_ANSWER_1, SAMPLE_ANSWER_2);
+generateMain(parseInput, solve1, solve2)(
+    ...(await getInputStrings(DAY)),
+    SAMPLE_ANSWER_1,
+    SAMPLE_ANSWER_2
+);

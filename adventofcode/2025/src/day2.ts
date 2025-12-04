@@ -58,7 +58,11 @@ function isSilly1(id: number): boolean {
 function isSilly2(id: number): boolean {
     const _id = String(id);
 
-    for (let substringLength = 1; substringLength <= Math.floor(_id.length / 2); substringLength++) {
+    for (
+        let substringLength = 1;
+        substringLength <= Math.floor(_id.length / 2);
+        substringLength++
+    ) {
         if (_id.length % substringLength !== 0) {
             continue;
         }
@@ -78,4 +82,8 @@ function isSilly2(id: number): boolean {
 }
 
 // Main.
-generateMain(parseInput, solve1, solve2)(...(await getInputStrings(DAY)), SAMPLE_ANSWER_1, SAMPLE_ANSWER_2);
+generateMain(parseInput, solve1, solve2)(
+    ...(await getInputStrings(DAY)),
+    SAMPLE_ANSWER_1,
+    SAMPLE_ANSWER_2
+);

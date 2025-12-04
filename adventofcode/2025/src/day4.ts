@@ -41,7 +41,11 @@ const solve2 = (input: Input): number => {
     return countRolls(input, true);
 };
 
-const countRolls = ({ getCell, height, removeRoll, width }: Input, withDeletion: boolean, count: number = 0): number => {
+const countRolls = (
+    { getCell, height, removeRoll, width }: Input,
+    withDeletion: boolean,
+    count: number = 0
+): number => {
     const initialCount = count;
 
     for (let x = 0; x < width; x++) {
@@ -59,7 +63,9 @@ const countRolls = ({ getCell, height, removeRoll, width }: Input, withDeletion:
                 [x - 1, y - 1],
                 [x - 1, y + 1],
             ] as const;
-            const rollsCount = surroundingCoordinates.map((coord) => getCell(coord[0], coord[1])).filter((cell) => cell === '@').length;
+            const rollsCount = surroundingCoordinates
+                .map((coord) => getCell(coord[0], coord[1]))
+                .filter((cell) => cell === '@').length;
 
             if (rollsCount < 4) {
                 count++;
@@ -74,8 +80,14 @@ const countRolls = ({ getCell, height, removeRoll, width }: Input, withDeletion:
         return count;
     }
 
-    return initialCount === count ? count : countRolls({ getCell, height, removeRoll, width }, withDeletion, count);
+    return initialCount === count
+        ? count
+        : countRolls({ getCell, height, removeRoll, width }, withDeletion, count);
 };
 
 // Main.
-generateMain(parseInput, solve1, solve2)(...(await getInputStrings(DAY)), SAMPLE_ANSWER_1, SAMPLE_ANSWER_2);
+generateMain(parseInput, solve1, solve2)(
+    ...(await getInputStrings(DAY)),
+    SAMPLE_ANSWER_1,
+    SAMPLE_ANSWER_2
+);
