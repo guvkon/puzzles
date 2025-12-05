@@ -55,35 +55,29 @@ const combineFreshRanges = (uncombinedRanges: Range[]): Range[] => {
         : combineFreshRanges(combinedRanges);
 };
 
-const isTwoRangesOverlapping = (a: Range, b: Range): boolean => {
-    const [aLeft, aRight] = a;
-    const [bLeft, bRight] = b;
-
-    return (
-        (aLeft <= bLeft && bLeft <= aRight) ||
-        (aLeft <= bRight && bRight <= aRight) ||
-        (aLeft <= bLeft && aRight >= bRight) ||
-        (bLeft <= aLeft && bRight >= aRight)
-    );
-};
+const isTwoRangesOverlapping = (a: Range, b: Range): boolean => getOverlappingRange(a, b) !== null;
 
 const combineTwoOverlappingRanges = (a: Range, b: Range): Range => {
+    const overlapping = getOverlappingRange(a, b);
+    if (overlapping === null) {
+        throw new Error('Trying to combine non-overlapping ranges!');
+    }
+
+    return overlapping;
+};
+
+const getOverlappingRange = (a: Range, b: Range): null | Range => {
     const [aLeft, aRight] = a;
     const [bLeft, bRight] = b;
 
-    if (aLeft <= bLeft && bLeft <= aRight) {
-        return [aLeft, bRight];
-    } else if (aLeft <= bRight && bRight <= aRight) {
-        return [bLeft, aRight];
-    } else if (aLeft <= bLeft && aRight >= bRight) {
-        return a;
-    } else if (bLeft <= aLeft && bRight >= aRight) {
-        return b;
+    if (aRight >= bLeft && aRight <= bRight) {
+        return [Math.min(aLeft, bLeft), bRight];
+    }
+    if (bRight >= aLeft && bRight <= aRight) {
+        return [Math.min(bLeft, aLeft), aRight];
     }
 
-    console.debug({ a, b });
-
-    throw new Error('Ranges are not overlapping!');
+    return null;
 };
 
 const isFresh = (id: number, freshRanges: Range[]): boolean =>
