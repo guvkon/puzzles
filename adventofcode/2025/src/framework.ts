@@ -4,7 +4,8 @@ type Solve<Input> = (input: Input) => number;
 export function generateMain<Input>(
     parseInput: ParseInput<Input>,
     solve1: Solve<Input>,
-    solve2: Solve<Input>
+    solve2: Solve<Input>,
+    parseInput2: ParseInput<Input> | null = null
 ) {
     return (input: string, sampleInput: string, sampleAnswer1: number, sampleAnswer2: number) => {
         // Answers
@@ -23,7 +24,8 @@ export function generateMain<Input>(
         console.log(`Answer for part 1: ${answer}`);
 
         // Part 2.
-        answer = solve2(parseInput(sampleInput));
+        const _parseInput = parseInput2 || parseInput;
+        answer = solve2(_parseInput(sampleInput));
         if (answer !== sampleAnswer2) {
             console.error(
                 `Wrong sample answer for part 2! Got: ${answer}, correct: ${sampleAnswer2}`
@@ -31,7 +33,7 @@ export function generateMain<Input>(
             return;
         }
 
-        answer = solve2(parseInput(input));
+        answer = solve2(_parseInput(input));
         console.log(`Answer for part 2: ${answer}`);
     };
 }
