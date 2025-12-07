@@ -14,6 +14,10 @@ type Grid = {
     width: number;
     height: number;
 };
+type Beam = {
+    count: number;
+    x: number;
+};
 
 type Input = Grid;
 
@@ -56,32 +60,50 @@ const solve1 = (input: Input): number => {
 };
 
 const solve2 = (input: Input): number => {
-    return placeBeams(input).length;
+    return placeBeams(input).count();
 };
 
-const placeBeams = (grid: Grid): number[] => {
-    const step = (grid: Grid, position: number, beams: number[]): number[] => {
-        const newBeams = [];
-        const y = position + 1;
-        for (const x of beams) {
+class BeamCollection {
+    beams: Beam[] = [];
+
+    add({ x, count }: Beam) {
+        const existing = this.beams.find((b) => b.x === x);
+        if (existing) {
+            existing.count += count;
+        } else {
+            this.beams.push({ x, count });
+        }
+    }
+
+    count() {
+        return this.beams.reduce((prev, curr) => prev + curr.count, 0);
+    }
+}
+
+const placeBeams = (grid: Grid): BeamCollection => {
+    const step = (grid: Grid, y: number, beams: BeamCollection): BeamCollection => {
+        const newBeams = new BeamCollection();
+
+        for (const { x, count } of beams.beams) {
             const cell = grid.getCell(x, y);
             switch (cell) {
                 case '^':
-                    grid.drawBeam(x - 1, y) && newBeams.push(x - 1);
-                    grid.drawBeam(x + 1, y) && newBeams.push(x + 1);
+                    grid.drawBeam(x - 1, y) && newBeams.add({ x: x - 1, count });
+                    grid.drawBeam(x + 1, y) && newBeams.add({ x: x + 1, count });
                     break;
                 default:
-                    grid.drawBeam(x, y) && newBeams.push(x);
+                    grid.drawBeam(x, y) && newBeams.add({ x, count });
             }
         }
+
         return newBeams;
     };
 
-    const start = findStart(grid);
-    let beams: number[] = [start[0]];
+    let beams: BeamCollection = new BeamCollection();
+    beams.add({ x: findStart(grid)[0], count: 1 });
+
     for (let y = 0; y < grid.height; y++) {
         beams = step(grid, y, beams);
-        console.debug({ y, beams: beams.length });
     }
 
     return beams;
