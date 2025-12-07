@@ -20,8 +20,11 @@ export function generateMain<Input>(
             return;
         }
 
+        const preAnswer1 = performance.now();
         answer = solve1(parseInput(input));
+        const postAnswer1 = performance.now();
         console.log(`Answer for part 1: ${answer}`);
+        console.log(`It took ${(postAnswer1 - preAnswer1).toFixed(3)} ms.`);
 
         // Part 2.
         const _parseInput = parseInput2 || parseInput;
@@ -33,8 +36,11 @@ export function generateMain<Input>(
             return;
         }
 
+        const preAnswer2 = performance.now();
         answer = solve2(_parseInput(input));
+        const postAnswer2 = performance.now();
         console.log(`Answer for part 2: ${answer}`);
+        console.log(`It took ${(postAnswer2 - preAnswer2).toFixed(3)} ms.`);
     };
 }
 
