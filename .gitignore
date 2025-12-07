@@ -2,6 +2,7 @@
 *~
 .idea
 elm-stuff
+/venv
 
 # Advent of Code inputs
 /adventofcode/**/input/
