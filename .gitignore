@@ -2,3 +2,8 @@
 *~
 .idea
 elm-stuff
+
+# Advent of Code inputs
+/adventofcode/**/input/
+/adventofcode/**/input*.txt
+/adventofcode/**/sample*.txt
