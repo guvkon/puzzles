@@ -1,3 +1,4 @@
+from time import process_time_ns
 from typing import Tuple
 
 
@@ -12,7 +13,13 @@ def run_solutions(day: int, solves, answers: Tuple[int, int], parts: int = 2):
     def run_part(part: int):
         answer = solves[part](input_sample)
         if answer == answers[part]:
-            print(f'Part {part+1} answer is: {solves[part](input)}')
+            start = process_time_ns()
+            answer = solves[part](input)
+            end = process_time_ns()
+            took_in_ms = (end - start) / 1000000
+
+            print(f'Part {part+1} answer is: {answer}')
+            print(f'It took %.3f ms' % took_in_ms)
         else:
             print(f'Part {part+1} answer is wrong! Should be {answers[part]}, got {answer}')
 
