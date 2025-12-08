@@ -6,23 +6,16 @@ from framework import run_solutions
 # Configuration
 DAY = 8
 SAMPLE_ANSWER1 = 40
-SAMPLE_ANSWER2 = 40
+SAMPLE_ANSWER2 = 25272
 
 
 # Solutions
 def solve1(input: str) -> int:
     boxes = parse(input)
-    union_ops_count = 10 if len(boxes) < 100 else 1000
-
-    # Prepare graph.
-    nodes = list(zip(range(0, len(boxes)), boxes))
-    edges = []
-    for i in range(0, len(boxes) - 1):
-        for j in range(i + 1, len(boxes)):
-            edges.append((i, j, distance(boxes[i], boxes[j])))
-    edges.sort(key=lambda edge: edge[2])
+    nodes, edges = prepare_graph(boxes)
 
     # Perform union operations.
+    union_ops_count = 10 if len(boxes) < 100 else 1000
     union_ops = [(edge[0], edge[1]) for edge in edges[0:union_ops_count]]
     for (p, q) in union_ops:
         p_id = nodes[p][0]
@@ -46,7 +39,48 @@ def solve1(input: str) -> int:
 
 
 def solve2(input: str) -> int:
-    return 0
+    boxes = parse(input)
+    nodes, edges = prepare_graph(boxes)
+    box1, box2 = get_last_connected(nodes, edges)
+
+    return box1[0] * box2[0]
+
+
+def get_last_connected(nodes, edges):
+    union_ops = [(edge[0], edge[1]) for edge in edges]
+    for (p, q) in union_ops:
+        p_id = nodes[p][0]
+        q_id = nodes[q][0]
+        if p_id == q_id:
+            continue
+        for i in range(0, len(nodes)):
+            if nodes[i][0] == p_id:
+                nodes[i] = (q_id, nodes[i][1])
+
+        if is_all_connected(nodes):
+            return nodes[p][1], nodes[q][1]
+
+    raise Exception('Cannot connect everything?!')
+
+
+
+def is_all_connected(nodes) -> bool:
+    first_id = nodes[0][0]
+    for id, _ in nodes:
+        if id != first_id:
+            return False
+    return True
+
+
+def prepare_graph(boxes: List[List[int]]) -> tuple:
+    nodes = list(zip(range(0, len(boxes)), boxes))
+    edges = []
+    for i in range(0, len(boxes) - 1):
+        for j in range(i + 1, len(boxes)):
+            edges.append((i, j, distance(boxes[i], boxes[j])))
+    edges.sort(key=lambda edge: edge[2])
+
+    return nodes, edges
 
 
 def distance(a, b) -> float:
