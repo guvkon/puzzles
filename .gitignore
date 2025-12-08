@@ -3,6 +3,7 @@
 .idea
 elm-stuff
 /venv
+__pycache__
 
 # Advent of Code inputs
 /adventofcode/**/input/
